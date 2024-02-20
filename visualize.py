@@ -23,44 +23,54 @@ def _visPedal(data, color):
 
     return returnstring + _setcolor("white") + "]" 
 
+def _steerRight(data):
+    returnstring = "     "
+    counter = 0.0
+
+    while counter < data:
+        returnstring = returnstring + "="
+        counter = round(counter + 0.2, 1) #no need to stretch the indicator to twice the length. round to avoid 0.00000000000000001 errors
+
+    #add middle
+    returnstring = returnstring + "="
+
+    #fill rest with spaces
+    while counter < 1.0:
+        returnstring = returnstring + " "
+        counter = round(counter + 0.2, 1)
+    
+    return returnstring
+
+def _steerLeft(data):
+    returnstring = ""
+    counter = -0.9 #lame fix for being offset by one char
+    while counter < data:
+        returnstring = returnstring + " "
+        counter = round(counter + 0.2, 1)
+
+    #fill until 0 with "="
+    while counter < 0.0:
+        returnstring = returnstring + "="
+        counter = round(counter + 0.2, 1)
+
+    #add middle 
+    returnstring = returnstring + "="
+
+    #fill rest with spaces
+    return returnstring + "     "
+
 def _visSteering(data):
+    #TODO: shows one bar later to the left as to the right
     returnstring = "["
 
-    if data > 0.0: #right steer
-        returnstring = returnstring + "     "
-        counter = 0.0
-        while counter < data:
-            returnstring = returnstring + "="
-            counter = round(counter + 0.2, 1) #no need to stretch the indicator to twice the length. round to avoid 0.00000000000000001 errors
-
-        #add middle
-        returnstring = returnstring + "="
-
-        #fill rest with spaces
-        while counter < 1.0:
-            returnstring = returnstring + " "
-            counter = round(counter + 0.2, 1)
+    if data > 0.0:
+        returnstring = returnstring + _steerRight(data)
 
     elif data < 0.0: #left steer
-        counter = -1.0
-        while counter < data:
-            returnstring = returnstring + " "
-            counter = round(counter + 0.2, 1)
+        returnstring = returnstring + _steerLeft(data)
 
-        #fill until 0 with "="
-        while counter < 0.0:
-            returnstring = returnstring + "="
-            counter = round(counter + 0.2, 1)
-
-        #add middle 
-        returnstring = returnstring + "="
-
-        #fill rest with spaces
-        returnstring = returnstring + "     "
-    
     elif data == 0.0: #no steering
         returnstring = returnstring + "     =     "
-
 
     return returnstring + "]"
 
@@ -123,28 +133,42 @@ def visualizePacket(packet, args):
     if args.isgitbash:
         print('\033[?25l', end="")  #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
     
+    printstring = ""
+
     #pick pedals, steering, rpm, speed, time, distance
-    printstring = ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\n"
-    printstring = printstring + ">>>   Brake:\t\t" + _visPedal(packet["vehicle_brake"], "red") + "\n"
-    printstring = printstring + ">>>   Clutch:\t\t" + _visPedal(packet["vehicle_clutch"], "white") + "\n"
-    printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], "red") + "\n\n"
-    
-    printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\n\n"
+    if "vehicle_throttle" in packet:
+        printstring = ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\n"
 
-    printstring = printstring + ">>>   Gear:\t\t" + _visGear(packet) + "\n"
-    printstring = printstring + ">>>   RPM:\t\t" + _visRpm(packet) + "\n"
+    if "vehicle_brake" in packet:
+        printstring = printstring + ">>>   Brake:\t\t" + _visPedal(packet["vehicle_brake"], "red") + "\n"
 
-    transspeed = packet["vehicle_transmission_speed"]
-    gpsspeed = packet["vehicle_speed"]
+    if "vehicle_clutch" in packet:        
+        printstring = printstring + ">>>   Clutch:\t\t" + _visPedal(packet["vehicle_clutch"], "white") + "\n"
 
-    slip = ""
-    if transspeed > gpsspeed * 1.2: #should roughly take care of the losses
-        slip = _setcolor("purple") + "**SLIP**"+ _setcolor("white") 
-    elif transspeed < gpsspeed * 0.5: 
-        slip = _setcolor("purple") + "**LOCKUP**"+ _setcolor("white") 
+    if "vehicle_handbrake" in packet:
+        printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], "red") + "\n\n"
 
-    printstring = printstring + ">>>   Trans Speed:\t" + str(packet["vehicle_transmission_speed"]) + " Km/h  " + slip + "\n"
-    printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\n"
+    if "vehicle_steering" in packet:    
+        printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\n\n"
+
+    if "vehicle_gear_maximum" in packet and "vehicle_gear_index" in packet and "vehicle_gear_index_reverse" in packet and "vehicle_gear_index_neutral" in packet:
+        printstring = printstring + ">>>   Gear:\t\t" + _visGear(packet) + "\n"
+
+    if "vehicle_engine_rpm_current" in packet and "vehicle_engine_rpm_max" in packet and "shiftlights_fraction" in packet:
+        printstring = printstring + ">>>   RPM:\t\t" + _visRpm(packet) + "\n"
+
+    if "vehicle_transmission_speed" in packet and "vehicle_speed" in packet:
+        transspeed = packet["vehicle_transmission_speed"]
+        gpsspeed = packet["vehicle_speed"]
+
+        slip = ""
+        if transspeed > gpsspeed * 1.2: #should roughly take care of the losses
+            slip = _setcolor("purple") + "**SLIP**"+ _setcolor("white") 
+        elif transspeed < gpsspeed * 0.5: 
+            slip = _setcolor("purple") + "**LOCKUP**"+ _setcolor("white") 
+
+        printstring = printstring + ">>>   Trans Speed:\t" + str(packet["vehicle_transmission_speed"]) + " Km/h  " + slip + "\n"
+        printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\n"
 
     print(printstring)
 
