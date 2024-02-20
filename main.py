@@ -2,7 +2,7 @@ import socket
 import time
 import interpret
 import argparse
-import os
+import util
 
 def connectToServer(args):
 
@@ -24,24 +24,33 @@ def connectToServer(args):
                 #if the whole function sleeps, the sleep will just create delay in the information
                 #so instead we keep receiving to pop from the socket but we do nothing with some of the packets
                 if (recvTime - interpTime) > 0.1:
-                    interpret.interpretPacket(data, args.config)
+                    interpret.interpretPacket(data, args)
                     interpTime = recvTime
 
             except socket.error:
-                os.system("clear")
-                print('\033[?25l', end="") #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
+                util.clearScreen(args.isgitbash)
+
+                if args.isgitbash:
+                    print('\033[?25l', end="") #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
+
                 print(">>>    No packets received, sleeping")
                 time.sleep(0.25)
     except KeyboardInterrupt:
         print("")
-        print('\033[?25h', end="") #bring cursor back
+
+        if args.isgitbash:
+            print('\033[?25h', end="") #bring cursor back
+
         print("Quitting")
+        exit(0)
 
 def main():
     parser = argparse.ArgumentParser(prog='wrc_telemetry', description='Read UDP telemetry for EA Sports WRC')
     parser.add_argument("-c", "--config", help="custom1 or custom2 or customX. default custom1", default="custom1", required=False)
     parser.add_argument("-i", "--ip", help="override the used ip. default 127.0.0.1", default="127.0.0.1", required=False)
     parser.add_argument("-p", "--port", help="override the used port. default 20777", type=int, default=20777,required=False)
+    parser.add_argument("-d", "--debug", help="print data packet instead of visualisation", default=False,required=False, action="store_true")
+    parser.add_argument("-g", "--isgitbash", help="uses clear to clear screen to avoid flicker", default=False,required=False, action="store_true")
     args = parser.parse_args()
 
     connectToServer(args)

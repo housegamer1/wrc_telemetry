@@ -1,29 +1,20 @@
 import util
-import os
+import visualize
 
-def interpretPacket(data, config):
+def interpretPacket(data, args):
     bytesAsNumerical = []
     for byte in data:
         bytesAsNumerical.append(byte)
 
-    if config == "custom1":
-        interpretCustom1(bytesAsNumerical)
-    elif config == "custom2":
-        interpretCustom2(bytesAsNumerical)
+    #TODO: read actual json config file, determine fields and automatically build packets based on that.
+    packet = {}
+    if args.config == "custom1":
+        packet = interpretCustom1(bytesAsNumerical)
+    elif args.config == "custom2":
+        packet = interpretCustom2(bytesAsNumerical)
 
-def printPacket(packet):
-    os.system("clear")
-    print('\033[?25l', end="")  #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
-    printstring = ">>>   "
-    count = 0
-    for field in packet:  
-        count = count + 1
-        printstring = printstring + str(field) + ": " + str(packet[field]) + " | "
-        if count == 3:
-            printstring = printstring + "\n>>>   "
-            count = 0
-    
-    print(printstring)
+    if packet != {}:
+        visualize.visualize(packet, args)
     
 def interpretCustom2(bytesAsNumerical):
     packet = {}
@@ -38,7 +29,7 @@ def interpretCustom2(bytesAsNumerical):
     packet["vehicle_engine_rpm_current"] = util.resolveFloatValueRound(bytesAsNumerical[5:])
 
     #print("Packet before interpretation:" + str(bytesAsNumerical))
-    printPacket(packet)
+    return packet
 
 def interpretCustom1(bytesAsNumerical):
     packet = {}
@@ -220,4 +211,4 @@ def interpretCustom1(bytesAsNumerical):
     # stage_length                      8 Bytes float64: in m
     packet["stage_length"] = util.resolveDoubleValue(bytesAsNumerical[229:237])
 
-    printPacket(packet)
+    return packet

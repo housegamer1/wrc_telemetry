@@ -1,4 +1,6 @@
 import struct
+import os
+import sys
 
 def _resolveFloat(asBytes):
     return round(struct.unpack("f", asBytes)[0], 2)
@@ -44,3 +46,12 @@ def resolveDoubleValueRound(byteValues):
 
 def resolveBoolean(byteValues):
     return bool(byteValues[0])
+
+def clearScreen(isgitbash):
+    os.system("") #needed to enable ansi codes. also removes flicker for git bash clear
+    if isgitbash:
+        os.system("clear") #less flicker than cls
+    else:
+        #os.system("cls")
+        print("\x1b[2J")
+        print("\x1b[H")
