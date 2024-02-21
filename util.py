@@ -14,6 +14,9 @@ def _resolveInt(asBytes):
 def _mpsToKmh(mps):
     return round(mps * 3.6, 2)
 
+def mToKm(m):
+    return round(m / 1000, 2)
+
 def resolveSpeed(byteValues):
     asBytes = bytes(byteValues)
     asMps =  _resolveFloat(asBytes) # in m/s
