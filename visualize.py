@@ -1,5 +1,5 @@
-import os
 import util
+import queue
 
 def visualize(packet, args):
     if args.debug:
@@ -125,6 +125,8 @@ def _applyTempColor(temperature):
         return _setcolor("yellow")
     elif temperature > 400:     #400 - inf
         return _setcolor("red")
+    else:
+        return ""
 
 def _visBrakeTemp(packet):
     fr = packet["vehicle_brake_temperature_fr"]
@@ -141,6 +143,99 @@ def _visBrakeTemp(packet):
     returnstring = returnstring + "\t\t\tRL [" + blColor + "||" + _setcolor("white") + "] " + str(bl) + "\t RR [" + brColor + "||" + _setcolor("white") + "] " + str(br)
 
     return returnstring
+
+def _pickCharToDraw(dp, oldDp):
+    chars = {
+        "throttle": "_",
+        "brake": "_"
+    }
+
+    if oldDp == {}:
+        return chars        
+
+    dpT = dp["throttle"]
+    dpB = dp["brake"]
+    odpT = oldDp["throttle"]
+    odpB = oldDp["brake"]
+
+    #print("dpt: " + str(dpT) + " old dpt: "+ str(odpT))
+
+    if dpT != 0: #dont depict rising if max already reached this tick
+        #inverse logic as the graph flipped the values to that 0/0 coord is bottom left
+        if dpT < odpT: 
+            chars["throttle"] = "/"
+        elif dpT > odpT:
+            chars["throttle"] = "\\"
+        else:
+            chars["throttle"] = "_"
+
+    if dpB != 0:
+        if dpB < odpB: 
+            chars["brake"] = "/"
+        elif dpB > odpB:
+            chars["brake"] = "\\"
+        else:
+            chars["brake"] = "_"   
+
+    return chars
+
+previousData = []
+def _visHisto(throttle, brake):
+    width = 30 #equal to age 
+    height = 11 #11 so WOT (10) will not out of bounds
+    
+    dataPoint = {
+        "throttle" : 10 - round(throttle *10), #value comes as 0.0 - 1.0
+        "brake" : 10 - round(brake * 10)
+    }
+
+    global previousData
+
+    if len(previousData) == width:
+        #buffer is full, remove old entry, copy to new list
+        previousData.pop(0)
+        newHist = []
+        for entry in previousData:
+            newHist.append(entry)
+        previousData = newHist
+
+    previousData.append(dataPoint) #append current data point
+
+    graph = [[" " for x in range(width)] for y in range(height)] # draw empty graph
+    
+    #draw graph
+    amountOfSkippedFields = width - len(previousData)
+    counter = 0
+    lastDatapointDrawn = {}
+    for dp in previousData:
+        while counter < amountOfSkippedFields: #fast forward to the columns we need to draw
+            counter = counter + 1
+            continue
+
+        dpT = dp["throttle"] 
+        dpB = dp["brake"]
+
+        charToDraw = _pickCharToDraw(dp, lastDatapointDrawn)
+
+        #idk why x and y flipped but it works lol
+        graph[dpT][counter] = _setcolor("green") + charToDraw["throttle"] + _setcolor("white")
+        graph[dpB][counter] = _setcolor("red") + charToDraw["brake"] + _setcolor("white")
+        counter = counter + 1        
+        lastDatapointDrawn = dp
+
+    #build return
+    returnstring = ""
+    firstRow = True
+    for row in graph:
+        if firstRow:
+            returnstring = returnstring + util.listToString(row)
+            firstRow = False
+        else:
+            returnstring = returnstring + "\t\t" + util.listToString(row)
+        returnstring = returnstring + "\n"
+
+    return returnstring
+
 
 def _setcolor(color):
     if color == "white":
@@ -169,7 +264,7 @@ def visualizePacket(packet, args):
     #TODO could do science with diff setting vs cp (contact patch) speed
     #TODO could do science with damper setting vs hub speed and position
     #TODO throttle / brake histogram iracing style
-    
+
     if "vehicle_throttle" in packet:
         printstring = ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\n"
 
@@ -208,7 +303,11 @@ def visualizePacket(packet, args):
         printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\n"
 
     if "vehicle_brake_temperature_bl" in packet and "vehicle_brake_temperature_br" in packet and "vehicle_brake_temperature_fl" in packet and "vehicle_brake_temperature_fr" in packet:
-        printstring = printstring + ">>>   Brake Temp:\t" + _visBrakeTemp(packet) + "\n"
+        printstring = printstring + ">>>   Brake Temp:\t" + _visBrakeTemp(packet) + "\n\n"
+
+
+    if "vehicle_throttle" in packet and "vehicle_brake" in packet:
+        printstring = printstring + ">>>   Histo:\t" + _visHisto(packet["vehicle_throttle"], packet["vehicle_brake"])
 
     print(printstring)
 

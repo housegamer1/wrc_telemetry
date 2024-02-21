@@ -23,7 +23,7 @@ def connectToServer(args):
                 #try not to interpret every frame.
                 #if the whole function sleeps, the sleep will just create delay in the information
                 #so instead we keep receiving to pop from the socket but we do nothing with some of the packets
-                if (recvTime - interpTime) > 0.1:
+                if (recvTime - interpTime) > 0.05:
                     interpret.interpretPacket(data, args)
                     interpTime = recvTime
 

@@ -58,3 +58,9 @@ def clearScreen(isgitbash):
         #os.system("cls")
         print("\x1b[2J")
         print("\x1b[H")
+
+def listToString(list):
+    returnstring = ""
+    for entry in list:
+        returnstring = returnstring + str(entry)
+    return returnstring
