@@ -160,7 +160,7 @@ def _pickCharToDraw(dp, oldDp):
 
     #print("dpt: " + str(dpT) + " old dpt: "+ str(odpT))
 
-    if dpT != 0: #dont depict rising if max already reached this tick
+    if dpT != 0 and dpT != 10: #dont depict rising if max already reached this tick
         #inverse logic as the graph flipped the values to that 0/0 coord is bottom left
         if dpT < odpT: 
             chars["throttle"] = "/"
@@ -169,7 +169,7 @@ def _pickCharToDraw(dp, oldDp):
         else:
             chars["throttle"] = "_"
 
-    if dpB != 0:
+    if dpB != 0  and dpB != 10:
         if dpB < odpB: 
             chars["brake"] = "/"
         elif dpB > odpB:
@@ -236,6 +236,74 @@ def _visHisto(throttle, brake):
 
     return returnstring
 
+previousAccel = []
+maxGfw = 0
+maxGsw = 0
+def _visAccel(fw, sw, resetMaxG):
+
+    width = 30 
+    height = 10
+
+    graph = [["." for x in range(width)] for y in range(height)] # draw empty graph
+
+    #draw trail
+    global previousAccel
+    for point in previousAccel:
+        graph[point["fw"]][point["sw"]] = "-"
+
+    centerFw = round(height / 2)
+    centerSw = round(width /2)
+
+    adjustFw = round(fw / 9.81, 1) #these are m/s² so convert to g
+    adjustSw = round(sw / 9.81, 1) 
+
+    #offset from center and pronounce visualisation.
+    #pronounce sw a lot more, since the graph is 3:1 stretched
+    newFw = centerFw + round(adjustFw * 2)
+    newSw = centerSw + round(adjustSw * 6) 
+
+    #cap the values
+    newFw = newFw if newFw < height else (height -1)
+    newSw = newSw if newSw < width else (width -1)
+    newFw = newFw if newFw > 0 else 0
+    newSw = newSw if newSw > 0 else 0
+
+    #print("[newFw][newSw] = [" + str(newFw) + "][" + str(newSw) + "]")
+    graph[newFw][newSw] = "+"
+
+    global maxGfw
+    global maxGsw
+
+    if(resetMaxG == 0):
+        #stagedistance is 0 so reset the maxcounter for restarts
+        maxGfw = 0
+        maxGsw = 0
+
+    if abs(adjustFw) > abs(maxGfw):
+        maxGfw = adjustFw
+    
+    if abs(adjustSw) > abs(maxGsw):
+        maxGsw = adjustSw
+
+    returnstring = "Fw: " + str(adjustFw) + "g (max: " + str(maxGfw) + ") Sw: " + str(adjustSw) + "g (max: " + str(maxGsw) + ")\t\n"
+    for row in graph:
+        returnstring = returnstring + "\t\t" + util.listToString(row)
+        returnstring = returnstring + "\n"
+
+    datapoint = {
+        "fw" : newFw,
+        "sw" : newSw
+    }
+
+    previousAccel.append(datapoint)
+    if len(previousAccel) >= 8: #8~looks okay
+        previousAccel.pop(0)
+        newHist = []
+        for entry in previousAccel:
+            newHist.append(entry)
+        previousAccel = newHist
+
+    return returnstring
 
 def _setcolor(color):
     if color == "white":
@@ -251,6 +319,48 @@ def _setcolor(color):
     elif color == "purple":
         return "\x1b[1;35;40m"
     
+def _drawSideBySide(leftDraw, rightDraw):
+    returnstring = ""    
+    leftLines = leftDraw.split("\n")
+    rightLines = rightDraw.split("\n")
+
+    lenL = len(leftLines)
+    lenR = len(rightLines)
+
+    counter = 0
+
+    if lenL >= lenR:
+        #loop over left, draw left then right
+        for lLine in leftLines:
+            returnstring = returnstring + lLine
+            
+            if counter < len(rightLines):
+                returnstring = returnstring + "\t" + rightLines[counter]
+
+            counter = counter +1
+            returnstring = returnstring + "\n"
+
+    else:
+        #loop over right, draw left then right
+        for rLine in rightLines:
+            if counter < len(leftLines):
+                returnstring = returnstring + leftLines[counter]
+
+            returnstring = returnstring + "\t" + rLine
+            counter = counter +1
+            returnstring = returnstring + "\n"
+
+
+    # for lLine in longer:
+    #     returnstring = returnstring + lLine
+
+    #     if counter < len(shorter):
+    #         returnstring = returnstring + "\t" + shorter[counter]
+
+    #     counter = counter +1
+    #     returnstring = returnstring + "\n"
+    return returnstring
+
 
 def visualizePacket(packet, args):
     util.clearScreen(args.isgitbash)
@@ -260,31 +370,29 @@ def visualizePacket(packet, args):
     
     printstring = ""
 
-    #TODO maybe accelerometer
     #TODO could do science with diff setting vs cp (contact patch) speed
     #TODO could do science with damper setting vs hub speed and position
-    #TODO throttle / brake histogram iracing style
 
     if "vehicle_throttle" in packet:
-        printstring = ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\n"
+        printstring = ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\t"
 
     if "vehicle_brake" in packet:
         printstring = printstring + ">>>   Brake:\t\t" + _visPedal(packet["vehicle_brake"], "red") + "\n"
 
     if "vehicle_clutch" in packet:        
-        printstring = printstring + ">>>   Clutch:\t\t" + _visPedal(packet["vehicle_clutch"], "white") + "\n"
+        printstring = printstring + ">>>   Clutch:\t\t" + _visPedal(packet["vehicle_clutch"], "white") + "\t"
 
     if "vehicle_handbrake" in packet:
         printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], "red") + "\n\n"
 
     if "vehicle_steering" in packet:    
-        printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\n"
+        printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\t"
 
     if "stage_current_distance" in packet and "stage_length" in packet:
         printstring = printstring + ">>>   Distance:\t\t" + str(util.mToKm(packet["stage_current_distance"])) + "/" + str(util.mToKm(packet["stage_length"])) + " km\n\n"
 
     if "vehicle_gear_maximum" in packet and "vehicle_gear_index" in packet and "vehicle_gear_index_reverse" in packet and "vehicle_gear_index_neutral" in packet:
-        printstring = printstring + ">>>   Gear:\t\t" + _visGear(packet) + "\n"
+        printstring = printstring + ">>>   Gear:\t\t" + _visGear(packet) + "\t\t"
 
     if "vehicle_engine_rpm_current" in packet and "vehicle_engine_rpm_max" in packet and "shiftlights_fraction" in packet:
         printstring = printstring + ">>>   RPM:\t\t" + _visRpm(packet) + "\n"
@@ -294,20 +402,34 @@ def visualizePacket(packet, args):
         gpsspeed = packet["vehicle_speed"]
 
         slip = ""
-        if transspeed > gpsspeed * 1.5: #should roughly take care of the losses
+        if transspeed > gpsspeed * 1.25: #should roughly take care of the losses. but gets unreliable at high speed
             slip = _setcolor("purple") + "**SLIP**"+ _setcolor("white") 
         elif transspeed < gpsspeed * 0.5: 
             slip = _setcolor("purple") + "**LOCKUP**"+ _setcolor("white") 
 
+        printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\t\t"
         printstring = printstring + ">>>   Trans Speed:\t" + str(packet["vehicle_transmission_speed"]) + " Km/h  " + slip + "\n"
-        printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\n"
+        
 
     if "vehicle_brake_temperature_bl" in packet and "vehicle_brake_temperature_br" in packet and "vehicle_brake_temperature_fl" in packet and "vehicle_brake_temperature_fr" in packet:
         printstring = printstring + ">>>   Brake Temp:\t" + _visBrakeTemp(packet) + "\n\n"
 
 
-    if "vehicle_throttle" in packet and "vehicle_brake" in packet:
-        printstring = printstring + ">>>   Histo:\t" + _visHisto(packet["vehicle_throttle"], packet["vehicle_brake"])
+    histoString = ""
+    if args.fancy and "vehicle_throttle" in packet and "vehicle_brake" in packet:
+        histoString = ">>>   Histo:\t" + _visHisto(packet["vehicle_throttle"], packet["vehicle_brake"]) #no newline as it comes from the graph already
+
+    accelstring = ""
+    if args.fancy and "vehicle_acceleration_x" in packet and "vehicle_acceleration_z" in packet: #y is up down
+
+        reset = 1
+        if "stage_current_distance" in packet:
+            reset = packet["stage_current_distance"] #reset max g logger on restart, default: never reset
+
+        accelstring = ">>>   Accel:\t" + _visAccel(packet["vehicle_acceleration_z"], packet["vehicle_acceleration_x"], reset) + "\n"
+        
+    if histoString != "" or accelstring != "":
+        printstring = printstring + _drawSideBySide(histoString, accelstring)
 
     print(printstring)
 

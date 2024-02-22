@@ -51,6 +51,7 @@ def main():
     parser.add_argument("-p", "--port", help="override the used port. default 20777", type=int, default=20777,required=False)
     parser.add_argument("-d", "--debug", help="print data packet instead of visualisation", default=False,required=False, action="store_true")
     parser.add_argument("-g", "--isgitbash", help="uses clear to clear screen to avoid flicker", default=False,required=False, action="store_true")
+    parser.add_argument("-f", "--fancy", help="shows graphs that take up more screen", default=False,required=False, action="store_true")
     args = parser.parse_args()
 
     connectToServer(args)

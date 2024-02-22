@@ -1,6 +1,7 @@
 import visualize
 
 def testSteering():
+    print("=== Steering test ===")
     print(visualize._visSteering(1.0) + " 1.0")
     print(visualize._visSteering(0.9) + " 0.9")
     print(visualize._visSteering(0.8) + " 0.8")
@@ -23,7 +24,22 @@ def testSteering():
     print(visualize._visSteering(-0.8) + " -0.8")
     print(visualize._visSteering(-0.9) + " -0.9")
     print(visualize._visSteering(-1.0) + " -1.0")
+    print("=== Steering test ===")
 
+def testAccel():
+    print("=== Accelerometer test ===")
+    print(visualize._visAccel(0,0,0))
+    print(visualize._visAccel(10,0,0))
+    print(visualize._visAccel(20,0,0))
+    print(visualize._visAccel(30,0,0))
+    print(visualize._visAccel(0,10,0))
+    print(visualize._visAccel(0,20,0))
+    print(visualize._visAccel(0,30,0))
+    print(visualize._visAccel(10,10,0))
+    print(visualize._visAccel(20,20,0))
+    print(visualize._visAccel(30,30,0))
+    print("=== Accelerometer test ===")
 
 if __name__ == "__main__":
     testSteering()
+    testAccel()
