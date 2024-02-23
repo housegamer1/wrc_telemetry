@@ -384,11 +384,11 @@ def visualizePacket(packet, args):
     if "vehicle_handbrake" in packet:
         printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], "red") + "\n\n"
 
-    if "vehicle_steering" in packet:    
-        printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\t"
-
     if "stage_current_distance" in packet and "stage_length" in packet:
-        printstring = printstring + ">>>   Distance:\t\t" + str(util.mToKm(packet["stage_current_distance"])) + "/" + str(util.mToKm(packet["stage_length"])) + " km\n\n"
+        printstring = printstring + ">>>   Distance:\t\t" + str(util.mToKm(packet["stage_current_distance"])) + "/" + str(util.mToKm(packet["stage_length"])) + " km\t"
+
+    if "vehicle_steering" in packet:    
+        printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\n\n"
 
     if "vehicle_gear_maximum" in packet and "vehicle_gear_index" in packet and "vehicle_gear_index_reverse" in packet and "vehicle_gear_index_neutral" in packet:
         printstring = printstring + ">>>   Gear:\t\t" + _visGear(packet) + "\t\t"
