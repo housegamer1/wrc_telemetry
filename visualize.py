@@ -1,5 +1,4 @@
 import util
-import queue
 
 def visualize(packet, args):
     if args.debug:
@@ -24,40 +23,40 @@ def _visPedal(data, color):
     return returnstring + _setcolor("white") + "]" 
 
 def _steerRight(data):
-    returnstring = "     "
-    counter = 0.0
+    returnstring = _steer(data)
 
-    while counter < data:
-        returnstring = returnstring + "="
-        counter = round(counter + 0.2, 1) #no need to stretch the indicator to twice the length. round to avoid 0.00000000000000001 errors
-
-    #add middle
-    returnstring = returnstring + "="
-
-    #fill rest with spaces
-    while counter < 1.0:
+    #add right spaces
+    while len(returnstring) < 10:
         returnstring = returnstring + " "
-        counter = round(counter + 0.2, 1)
-    
+
+    #add middle 
+    returnstring = "          =" + returnstring 
+
     return returnstring
 
 def _steerLeft(data):
-    returnstring = ""
-    counter = -0.9 #lame fix for being offset by one char in neg numbers
-    while counter < data:
-        returnstring = returnstring + " "
-        counter = round(counter + 0.2, 1)
+    returnstring = _steer(data)
 
-    #fill until 0 with "="
-    while counter < 0.0:
-        returnstring = returnstring + "="
-        counter = round(counter + 0.2, 1)
+    #add left spaces
+    while len(returnstring) < 10:
+        returnstring = " " + returnstring
 
     #add middle 
     returnstring = returnstring + "="
 
     #fill rest with spaces
-    return returnstring + "     "
+    return returnstring + "          "
+
+def _steer(data):
+    data = abs(data)
+    returnstring = ""
+    counter = 0.0
+
+    while counter < data:
+        returnstring = returnstring + "="
+        counter = round(counter + 0.1, 1) #no need to stretch the indicator to twice the length. round to avoid 0.00000000000000001 errors
+    
+    return returnstring
 
 def _visSteering(data):
     #TODO: shows one bar later to the left as to the right
@@ -70,7 +69,7 @@ def _visSteering(data):
         returnstring = returnstring + _steerLeft(data)
 
     elif data == 0.0: #no steering
-        returnstring = returnstring + "     =     "
+        returnstring = returnstring + "          =          "
 
     return returnstring + "]"
 
