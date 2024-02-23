@@ -1,5 +1,6 @@
 import visualize
-
+# not real testing okay, cba to do that.
+# just a helper to analyse certain issues
 def testSteering():
     print("=== Steering test ===")
     print(visualize._visSteering(1.0) + " 1.0")
