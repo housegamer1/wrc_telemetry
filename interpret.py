@@ -1,10 +1,31 @@
 import util
-import visualize
+import dashboard
+import raw
+import inout
+import suspension
+import time
 
+timeOfLastFrame = 0
 def interpretPacket(data, args):
+    #print("data is: " + str(data))
+
+    global timeOfLastFrame
+    if timeOfLastFrame == 0:
+        timeOfLastFrame = time.time()
+    else:
+        now = time.time()
+        print("Time since last frame: " + str(round(now - timeOfLastFrame, 2)))
+        timeOfLastFrame = now
+
     bytesAsNumerical = []
-    for byte in data:
-        bytesAsNumerical.append(byte)
+    if inout.replayMode == 0:
+        bytesAsNumerical = []
+        for byte in data:
+            bytesAsNumerical.append(byte)
+    else:
+        bytesAsNumerical = data    
+
+    #print("bytes as numerical: "+  str(bytesAsNumerical))
 
     #TODO: read actual json config file, determine fields and automatically build packets based on that.
     packet = {}
@@ -14,7 +35,22 @@ def interpretPacket(data, args):
         packet = interpretCustom2(bytesAsNumerical)
 
     if packet != {}:
-        visualize.visualize(packet, args)
+        inout.clearScreen(args)
+
+        if inout.currentScreen == 1:
+            dashboard.visualizePacket(packet, False)
+        elif inout.currentScreen == 2:
+            dashboard.visualizePacket(packet, True)
+        elif inout.currentScreen == 3:
+            suspension.visualizePacket(packet)
+        elif inout.currentScreen == 4:
+            raw.printPacket(packet)
+    else:
+        print("unable to interpret packet")
+
+    if inout.recordingStatus == 1:
+        inout.logFrame(bytesAsNumerical)
+
     
 def interpretCustom2(bytesAsNumerical):
     packet = {}
@@ -131,16 +167,16 @@ def interpretCustom1(bytesAsNumerical):
     packet["vehicle_up_direction_z"] = util.resolveFloatValueRound(bytesAsNumerical[117:121])
 
     # vehicle_hub_position_bl           4 Bytes float32: in m
-    packet["vehicle_hub_position_bl"] = util.resolveFloatValueRound(bytesAsNumerical[121:125])
+    packet["vehicle_hub_position_bl"] = util.resolveFloatValue(bytesAsNumerical[121:125])
 
     # vehicle_hub_position_br           4 Bytes float32: in m
-    packet["vehicle_hub_position_br"] = util.resolveFloatValueRound(bytesAsNumerical[125:129])
+    packet["vehicle_hub_position_br"] = util.resolveFloatValue(bytesAsNumerical[125:129])
 
     # vehicle_hub_position_fl           4 Bytes float32: in m
-    packet["vehicle_hub_position_fl"] = util.resolveFloatValueRound(bytesAsNumerical[129:133])
+    packet["vehicle_hub_position_fl"] = util.resolveFloatValue(bytesAsNumerical[129:133])
 
     # vehicle_hub_position_fr           4 Bytes float32: in m
-    packet["vehicle_hub_position_fr"] = util.resolveFloatValueRound(bytesAsNumerical[133:137])
+    packet["vehicle_hub_position_fr"] = util.resolveFloatValue(bytesAsNumerical[133:137])
 
     # vehicle_hub_velocity_bl           4 Bytes float32: in m/s
     packet["vehicle_hub_velocity_bl"] = util.resolveSpeed(bytesAsNumerical[137:141])

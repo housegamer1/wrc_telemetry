@@ -1,13 +1,7 @@
-import util
-
-def visualize(packet, args):
-    if args.debug:
-        printPacket(packet, args)
-    else:
-        visualizePacket(packet, args)        
+import util   
 
 def _visPedal(data, color):
-    returnstring = _setcolor("white") + "[" + _setcolor(color)
+    returnstring = util.setcolor("white") + "[" + util.setcolor(color)
     counter = 0.0
     
     #pedal position in "=" characters / 10
@@ -20,7 +14,7 @@ def _visPedal(data, color):
         returnstring = returnstring + " "
         counter = counter + 0.1
 
-    return returnstring + _setcolor("white") + "]" 
+    return returnstring + util.setcolor("white") + "]" 
 
 def _steerRight(data):
     returnstring = _steer(data)
@@ -91,14 +85,14 @@ def _visRpm(packet):
     maxRpm = packet["vehicle_engine_rpm_max"]
     rpmPercent = packet["shiftlights_fraction"]
 
-    returnstring = _setcolor("white") + "["
+    returnstring = util.setcolor("white") + "["
 
     counter = 0.0
     while counter < rpmPercent:
         if counter > 0.8:
-            returnstring = returnstring + _setcolor("red") + "="
+            returnstring = returnstring + util.setcolor("red") + "="
         elif counter > 0.6:
-            returnstring = returnstring + _setcolor("yellow") + "="
+            returnstring = returnstring + util.setcolor("yellow") + "="
         else :
             returnstring = returnstring + "="
         
@@ -109,21 +103,21 @@ def _visRpm(packet):
         returnstring = returnstring + " "
         counter = counter + 0.1
 
-    return returnstring + _setcolor("white") + "]\t" + str(currentRpm) + "/" + str(maxRpm)
+    return returnstring + util.setcolor("white") + "]\t" + str(currentRpm) + "/" + str(maxRpm)
 
 def _applyTempColor(temperature):
     #Highest brake temp i could force was like 600
 
     if temperature <= 0:
-        return _setcolor("purple")
+        return util.setcolor("purple")
     elif temperature < 75:      #0-75
-        return _setcolor("blue")
+        return util.setcolor("blue")
     elif temperature < 250:     #75 - 250
-        return _setcolor("green")
+        return util.setcolor("green")
     elif temperature < 400:     #250 -400
-        return _setcolor("yellow")
+        return util.setcolor("yellow")
     elif temperature > 400:     #400 - inf
-        return _setcolor("red")
+        return util.setcolor("red")
     else:
         return ""
 
@@ -138,8 +132,8 @@ def _visBrakeTemp(packet):
     brColor = _applyTempColor(br)
     blColor = _applyTempColor(bl)
 
-    returnstring = "FL [" + flColor + "||" + _setcolor("white") +"] " + str(fl) + "\t FR [" + frColor + "||" + _setcolor("white") + "] " + str(fr) + "\n"
-    returnstring = returnstring + "\t\t\tRL [" + blColor + "||" + _setcolor("white") + "] " + str(bl) + "\t RR [" + brColor + "||" + _setcolor("white") + "] " + str(br)
+    returnstring = "FL [" + flColor + "||" + util.setcolor("white") +"] " + str(fl) + "\t FR [" + frColor + "||" + util.setcolor("white") + "] " + str(fr) + "\n"
+    returnstring = returnstring + "\t\t\tRL [" + blColor + "||" + util.setcolor("white") + "] " + str(bl) + "\t RR [" + brColor + "||" + util.setcolor("white") + "] " + str(br)
 
     return returnstring
 
@@ -217,8 +211,8 @@ def _visHisto(throttle, brake):
         charToDraw = _pickCharToDraw(dp, lastDatapointDrawn)
 
         #idk why x and y flipped but it works lol
-        graph[dpT][counter] = _setcolor("green") + charToDraw["throttle"] + _setcolor("white")
-        graph[dpB][counter] = _setcolor("red") + charToDraw["brake"] + _setcolor("white")
+        graph[dpT][counter] = util.setcolor("green") + charToDraw["throttle"] + util.setcolor("white")
+        graph[dpB][counter] = util.setcolor("red") + charToDraw["brake"] + util.setcolor("white")
         counter = counter + 1        
         lastDatapointDrawn = dp
 
@@ -227,10 +221,10 @@ def _visHisto(throttle, brake):
     firstRow = True
     for row in graph:
         if firstRow:
-            returnstring = returnstring + util.listToString(row)
+            returnstring = returnstring + util.listToString(row, False)
             firstRow = False
         else:
-            returnstring = returnstring + "\t\t" + util.listToString(row)
+            returnstring = returnstring + "\t\t" + util.listToString(row, False)
         returnstring = returnstring + "\n"
 
     return returnstring
@@ -286,7 +280,7 @@ def _visAccel(fw, sw, resetMaxG):
 
     returnstring = "Fw: " + str(adjustFw) + "g (max: " + str(maxGfw) + ") Sw: " + str(adjustSw) + "g (max: " + str(maxGsw) + ")\t\n"
     for row in graph:
-        returnstring = returnstring + "\t\t" + util.listToString(row)
+        returnstring = returnstring + "\t\t" + util.listToString(row, False)
         returnstring = returnstring + "\n"
 
     datapoint = {
@@ -304,68 +298,8 @@ def _visAccel(fw, sw, resetMaxG):
 
     return returnstring
 
-def _setcolor(color):
-    if color == "white":
-        return "\x1b[0m"
-    elif color == "red":
-        return "\x1b[1;31;40m"
-    elif color == "green":
-        return "\x1b[1;32;40m"
-    elif color == "yellow":
-        return "\x1b[1;33;40m"
-    elif color == "blue":
-        return "\x1b[1;34;40m"
-    elif color == "purple":
-        return "\x1b[1;35;40m"
-    
-def _drawSideBySide(leftDraw, rightDraw):
-    returnstring = ""    
-    leftLines = leftDraw.split("\n")
-    rightLines = rightDraw.split("\n")
 
-    lenL = len(leftLines)
-    lenR = len(rightLines)
-
-    counter = 0
-
-    if lenL >= lenR:
-        #loop over left, draw left then right
-        for lLine in leftLines:
-            returnstring = returnstring + lLine
-            
-            if counter < len(rightLines):
-                returnstring = returnstring + "\t" + rightLines[counter]
-
-            counter = counter +1
-            returnstring = returnstring + "\n"
-
-    else:
-        #loop over right, draw left then right
-        for rLine in rightLines:
-            if counter < len(leftLines):
-                returnstring = returnstring + leftLines[counter]
-
-            returnstring = returnstring + "\t" + rLine
-            counter = counter +1
-            returnstring = returnstring + "\n"
-
-
-    # for lLine in longer:
-    #     returnstring = returnstring + lLine
-
-    #     if counter < len(shorter):
-    #         returnstring = returnstring + "\t" + shorter[counter]
-
-    #     counter = counter +1
-    #     returnstring = returnstring + "\n"
-    return returnstring
-
-
-def visualizePacket(packet, args):
-    util.clearScreen(args.isgitbash)
-
-    if args.isgitbash:
-        print('\033[?25l', end="")  #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
+def visualizePacket(packet, fancy):
     
     printstring = ""
 
@@ -402,9 +336,9 @@ def visualizePacket(packet, args):
 
         slip = ""
         if transspeed > gpsspeed * 1.25: #should roughly take care of the losses. but gets unreliable at high speed
-            slip = _setcolor("purple") + "**SLIP**"+ _setcolor("white") 
+            slip = util.setcolor("purple") + "**SLIP**"+ util.setcolor("white") 
         elif transspeed < gpsspeed * 0.5: 
-            slip = _setcolor("purple") + "**LOCKUP**"+ _setcolor("white") 
+            slip = util.setcolor("purple") + "**LOCKUP**"+ util.setcolor("white") 
 
         printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\t\t"
         printstring = printstring + ">>>   Trans Speed:\t" + str(packet["vehicle_transmission_speed"]) + " Km/h  " + slip + "\n"
@@ -415,11 +349,11 @@ def visualizePacket(packet, args):
 
 
     histoString = ""
-    if args.fancy and "vehicle_throttle" in packet and "vehicle_brake" in packet:
+    if fancy and "vehicle_throttle" in packet and "vehicle_brake" in packet:
         histoString = ">>>   Histo:\t" + _visHisto(packet["vehicle_throttle"], packet["vehicle_brake"]) #no newline as it comes from the graph already
 
     accelstring = ""
-    if args.fancy and "vehicle_acceleration_x" in packet and "vehicle_acceleration_z" in packet: #y is up down
+    if fancy and "vehicle_acceleration_x" in packet and "vehicle_acceleration_z" in packet: #y is up down
 
         reset = 1
         if "stage_current_distance" in packet:
@@ -428,24 +362,6 @@ def visualizePacket(packet, args):
         accelstring = ">>>   Accel:\t" + _visAccel(packet["vehicle_acceleration_z"], packet["vehicle_acceleration_x"], reset) + "\n"
         
     if histoString != "" or accelstring != "":
-        printstring = printstring + _drawSideBySide(histoString, accelstring)
+        printstring = printstring + util.drawSideBySide(histoString, accelstring)
 
-    print(printstring)
-
-
-def printPacket(packet, args):
-    util.clearScreen(args.isgitbash)
-
-    if args.isgitbash:
-        print('\033[?25l', end="")  #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
-
-    printstring = ">>>   "
-    count = 0
-    for field in packet:  
-        count = count + 1
-        printstring = printstring + str(field) + ": " + str(packet[field]) + " | "
-        if count == 3:
-            printstring = printstring + "\n>>>   "
-            count = 0
-    
     print(printstring)
