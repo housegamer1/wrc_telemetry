@@ -84,6 +84,12 @@ optional arguments:
   -g, --isgitbash       uses clear to clear screen to avoid flicker
 ```
 
+The program should receive packets the moment you start a stage, just before the countdown begins.<br>
+Use the keys listed in the top menu to navigate screens (1,2,3,4,Q,R,L).<br>
+In the load menu, navigate with arrow keys and enter to select a replay. Scrub through the replay with the right arrow key<br>
+Replays are saved to ```logs/``` once you press ```R``` again. They are named after the given config and the timestamp. Note that currently only replays made with the currently active config can be viewed.
+
+
 ## Precondition - Enable UDP telemetry export from the game
 Check out YourUser\Documents\My Games\WRC\telemetry.<br>
 Located in that directory is ```config.json```, which lists the different default configs for the telemetry.<br>
@@ -114,3 +120,4 @@ Make sure to set ```bEnabled``` for ```custom1``` to true (game restart needed).
 * Transmission speed column in Dashboard view shifts when GPS speed exceeds 100 Km/h
 * Units only calculated in metric
 * Reaction to keyboard inputs is currently bound to package handling and is therefore not very responsive
+* Replays only available for the currently running config
