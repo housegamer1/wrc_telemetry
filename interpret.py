@@ -14,7 +14,7 @@ def interpretPacket(data, args):
         timeOfLastFrame = time.time()
     else:
         now = time.time()
-        print("Time since last frame: " + str(round(now - timeOfLastFrame, 2)))
+        #print("Time since last frame: " + str(round(now - timeOfLastFrame, 2)))
         timeOfLastFrame = now
 
     bytesAsNumerical = []
