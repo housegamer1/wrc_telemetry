@@ -97,7 +97,7 @@ The game ships with a few example configs called ```wrc``` and ```wrc_experiment
 This is the config the client is currently written for (essentially it is the same as ```wrc```).<br>
 Might make it more dynamic in the future.<br><br>
 
-Make sure to set ```bEnabled``` for ```custom1``` to true (game restart needed).<br>
+Make sure to set ```bEnabled``` for ```custom1``` to ```true``` (game restart needed).<br>
 ```
 {
 				"structure": "custom1",
