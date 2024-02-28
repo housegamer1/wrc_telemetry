@@ -113,7 +113,7 @@ Make sure to set ```bEnabled``` for ```custom1``` to ```true``` (game restart ne
 ## Known issues and TODOs
 * Replaying recorded telemetry data is not guaranteed to run at the correct speed
 * Accelerometer data provided by the game is not bound to the cars orientation. The provided vaules are relative to the fixed directions on the map. I am not sure if I can fix this on my own with the provided telemetry data. imo codies should fix this.
-* Limited to fixed structure configs. use ```custom1```
+* Limited to fixed structure configs. use ```custom1``` for now.
 * SLIP and LOCKUP indicators are based on the difference between GPS speed and transmission speed with a factor. Therefore both are more likely to be detected at lower speeds. Should compute based on the individually provided contact patch information.
 * Car and stage info is not available in the UDP telemetry. Could try to check if stage length works as a unique identifier.
 * Can only scrub forwards through replays, going back is not supported
@@ -121,3 +121,4 @@ Make sure to set ```bEnabled``` for ```custom1``` to ```true``` (game restart ne
 * Units only calculated in metric
 * Reaction to keyboard inputs is currently bound to package handling and is therefore not very responsive
 * Replays only available for the currently running config
+* Add option to make the histo graph wider and remove the accelerometer graph as its not really useful with the data the telemetry provides
