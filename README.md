@@ -121,4 +121,4 @@ Make sure to set ```bEnabled``` for ```custom1``` to ```true``` (game restart ne
 * Units only calculated in metric
 * Reaction to keyboard inputs is currently bound to package handling and is therefore not very responsive
 * Replays only available for the currently running config
-* Add option to make the histo graph wider and remove the accelerometer graph as its not really useful with the data the telemetry provides
+* <s>Add option to make the histo graph wider and remove the accelerometer graph as its not really useful with the data the telemetry provides</s>

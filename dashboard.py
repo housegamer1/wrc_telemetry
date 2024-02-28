@@ -1,4 +1,5 @@
 import util   
+import inout
 
 def _visPedal(data, color):
     returnstring = util.setcolor("white") + "[" + util.setcolor(color)
@@ -174,7 +175,15 @@ def _pickCharToDraw(dp, oldDp):
 
 previousData = []
 def _visHisto(throttle, brake):
+    global previousData
+
     width = 30 #equal to age 
+    if inout.toggleAccelerometer == 0:
+        width = 90
+
+    if width == 30 and len(previousData) > 30:
+        previousData.clear()
+
     height = 11 #11 so WOT (10) will not out of bounds
     
     dataPoint = {
@@ -182,7 +191,6 @@ def _visHisto(throttle, brake):
         "brake" : 10 - round(brake * 10)
     }
 
-    global previousData
 
     if len(previousData) == width:
         #buffer is full, remove old entry, copy to new list
@@ -348,12 +356,13 @@ def visualizePacket(packet, fancy):
         printstring = printstring + ">>>   Brake Temp:\t" + _visBrakeTemp(packet) + "\n\n"
 
 
+    printstring = printstring + ">>>   Press (T) to toggle accelerometer\n"
     histoString = ""
     if fancy and "vehicle_throttle" in packet and "vehicle_brake" in packet:
         histoString = ">>>   Histo:\t" + _visHisto(packet["vehicle_throttle"], packet["vehicle_brake"]) #no newline as it comes from the graph already
 
     accelstring = ""
-    if fancy and "vehicle_acceleration_x" in packet and "vehicle_acceleration_z" in packet: #y is up down
+    if inout.toggleAccelerometer == 1 and fancy and "vehicle_acceleration_x" in packet and "vehicle_acceleration_z" in packet: #y is up down
 
         reset = 1
         if "stage_current_distance" in packet:

@@ -12,6 +12,7 @@ recordingStatus = 0
 replayMode = 0
 selected = 0
 skipAhead = 0
+toggleAccelerometer = 0
 def showMenu(args):
     readInput(args)
 
@@ -74,6 +75,7 @@ def readInput(args):
         global cursorPos
         global selected
         global skipAhead
+        global toggleAccelerometer
 
         if num == 49: #1 button
             currentScreen = 1
@@ -115,6 +117,12 @@ def readInput(args):
 
         elif num == 77: #right arrow
             skipAhead = 1
+
+        elif num == 116 and currentScreen == 2: #t button
+            if toggleAccelerometer == 1:
+                toggleAccelerometer = 0
+            else:
+                toggleAccelerometer = 1
 
 cursorPos = 0
 def showLoadMenu(args):
