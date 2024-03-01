@@ -4,6 +4,7 @@ import raw
 import inout
 import suspension
 import time
+import science
 
 timeOfLastFrame = 0
 def interpretPacket(data, args):
@@ -45,6 +46,8 @@ def interpretPacket(data, args):
             suspension.visualizePacket(packet)
         elif inout.currentScreen == 4:
             raw.printPacket(packet)
+        elif inout.currentScreen == 5:
+            science.printPacket(packet)
     else:
         print("unable to interpret packet")
 

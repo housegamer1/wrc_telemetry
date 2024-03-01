@@ -7,7 +7,7 @@ import interpret
 import ast
 
 
-currentScreen = 4
+currentScreen = 2
 recordingStatus = 0
 replayMode = 0
 selected = 0
@@ -23,7 +23,7 @@ def showMenu(args):
 
     if currentScreen == 2:
        menuString = menuString + util.setcolor("yellow")
-    menuString = menuString + "(2) Dashboard + Graphs" + util.setcolor("white") + " | "
+    menuString = menuString + "(2) Graphs" + util.setcolor("white") + " | "
 
     if currentScreen == 3:
        menuString = menuString + util.setcolor("yellow")
@@ -32,6 +32,10 @@ def showMenu(args):
     if currentScreen == 4:
        menuString = menuString + util.setcolor("yellow")
     menuString = menuString + "(4) Raw" + util.setcolor("white") + " | "
+
+    if currentScreen == 5:
+        menuString = menuString + util.setcolor("yellow")
+    menuString = menuString + "(5) 0-100 Times" + util.setcolor("white") + " | "
 
     menuString = menuString + "(Q) Quit | "
 
@@ -88,6 +92,9 @@ def readInput(args):
 
         elif num == 52: #4 button
             currentScreen = 4
+
+        elif num == 53: #5button
+            currentScreen = 5
 
         elif num == 113: #q button
             util.quit(args)
