@@ -1,6 +1,7 @@
 import dashboard
 import inout 
-
+import suspension
+import util
 
 # not real testing okay, cba to do that.
 # just a helper to analyse certain issues
@@ -79,8 +80,28 @@ def testMenu():
     while True:
         inout.clearScreen(args)
 
+def testHubPos():
+
+    #need this for ansi colors
+    class Arg():
+        pass
+    args = Arg()
+    args.isgitbash = True
+    inout.clearScreen(args)
+
+    packet = {
+        "vehicle_hub_position_fl" : 0.0,
+        "vehicle_hub_position_fr" : 0.2,
+        "vehicle_hub_position_bl" : -0.19,
+        "vehicle_hub_position_br" : -0.12
+    }
+
+    print("=== Hub pos test ===")
+    suspension.visualizePacket(packet)
+    print("=== Hub pos test end ===")
+
 if __name__ == "__main__":
     #testSteering()
     #testAccel()
-    testMenu()
-    
+    #testMenu()
+    testHubPos()
