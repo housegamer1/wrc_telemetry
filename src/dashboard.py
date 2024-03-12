@@ -312,10 +312,26 @@ def visualizePacket(packet, fancy):
     printstring = ""
 
     #TODO could do science with diff setting vs cp (contact patch) speed
-    #TODO could do science with damper setting vs hub speed and position
+    car = ""
+    manufacturer = ""
+    carclass = ""
+    location = ""
+    stage = ""
+
+    if "vehicle_id" in packet:
+        car = util.resolveId(packet["vehicle_id"], "vehicles")
+
+    if "location_id" in packet:
+        location = util.resolveId(packet["location_id"], "locations")
+
+    if "route_id" in packet:
+        stage = util.resolveId(packet["route_id"], "routes")
+
+    if car != "" or location != "" or stage != "":
+        printstring = printstring + car + " | " + location + " " + stage + "\n\n"
 
     if "vehicle_throttle" in packet:
-        printstring = ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\t"
+        printstring = printstring + ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\t"
 
     if "vehicle_brake" in packet:
         printstring = printstring + ">>>   Brake:\t\t" + _visPedal(packet["vehicle_brake"], "red") + "\n"

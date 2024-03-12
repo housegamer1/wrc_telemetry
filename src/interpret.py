@@ -27,11 +27,14 @@ def interpretPacket(data, args):
         bytesAsNumerical = data    
 
     #print("bytes as numerical: "+  str(bytesAsNumerical))
+    #print("Number of exported fields: "+  str(len(bytesAsNumerical)))
 
     #TODO: read actual json config file, determine fields and automatically build packets based on that.
     packet = {}
     if args.config == "custom1":
-        packet = interpretCustom1(bytesAsNumerical)
+        packet = interpretCustom1(bytesAsNumerical, False)
+    if args.config == "custom1_mod":
+        packet = interpretCustom1(bytesAsNumerical, True) #too lazy to make dynamic config loading just yet
     elif args.config == "custom2":
         packet = interpretCustom2(bytesAsNumerical)
 
@@ -70,7 +73,7 @@ def interpretCustom2(bytesAsNumerical):
     #print("Packet before interpretation:" + str(bytesAsNumerical))
     return packet
 
-def interpretCustom1(bytesAsNumerical):
+def interpretCustom1(bytesAsNumerical, modifiedCustom1):
     packet = {}
 
     # packet_uid                        8 Bytes uint64
@@ -249,5 +252,21 @@ def interpretCustom1(bytesAsNumerical):
 
     # stage_length                      8 Bytes float64: in m
     packet["stage_length"] = util.resolveDoubleValue(bytesAsNumerical[229:237])
+
+    if modifiedCustom1:
+        #vehicle_id                     2 Bytes uint16
+        packet["vehicle_id"] = util.resolveIntValue(bytesAsNumerical[237:239])
+
+        #vehicle_class_id               2 Bytes uint16
+        packet["vehicle_class_id"] = util.resolveIntValue(bytesAsNumerical[239:241])
+
+        #vehicle_manufacturer_id        2 Bytes uint16
+        packet["vehicle_manufacturer_id"] = util.resolveIntValue(bytesAsNumerical[241:243])
+
+        #location_id                    2 Bytes uint16
+        packet["location_id"] = util.resolveIntValue(bytesAsNumerical[243:245])
+
+        #route_id                       2 Bytes uint16
+        packet["route_id"] = util.resolveIntValue(bytesAsNumerical[245:247])
 
     return packet

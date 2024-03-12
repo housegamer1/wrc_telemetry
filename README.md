@@ -109,6 +109,11 @@ Make sure to set ```bEnabled``` for ```custom1``` to ```true``` (game restart ne
 },
 ```
 
+WRC Patch 1.6 Update:<br>
+This patch introduced new information for the API, but did not provide a config that contains it.<br>
+Therefore, i have modified custom1 and will provide the custom1_mod file in this repository. <br>
+Make sure you place this in ```YourUser\Documents\My Games\WRC\telemetry\udp``` and make an entry for it in config.json with bEnabled set to true.<br><br>
+For the time being, custom1 will remain the default value, as this will be present for every installation of the game. Launch the client with ```-c custom1_mod``` to get car and stage information.
 
 ## Known issues and TODOs
 * Replaying recorded telemetry data is not guaranteed to run at the correct speed

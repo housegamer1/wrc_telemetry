@@ -1,6 +1,6 @@
 import struct
+import json
 import os
-
 
 def _resolveFloat(asBytes):
     return round(struct.unpack("f", asBytes)[0], 2)
@@ -115,3 +115,31 @@ def drawSideBySide(leftDraw, rightDraw):
             returnstring = returnstring + "\n"
 
     return returnstring
+
+loadedIds = None
+def resolveId(id, section):
+    #print("Resolve id: " + str(id) + ", in section: " + str(section))
+    global loadedIds    
+    returnString = "N/A"
+
+    if loadedIds == None:
+        homeDir = os.path.expanduser('~')
+        idFileLocation = homeDir + '/Documents/My Games/WRC/telemetry/readme/ids.json'
+        
+        if homeDir != None and homeDir != "" and os.path.isfile(idFileLocation):
+            idFile = open(idFileLocation, encoding="utf-16")
+            #print("id file:" +str(idFile))
+            if idFile != None:
+                loadedIds = json.load(idFile)
+            idFile.close()
+        else:
+            #print("Unable to open id file")
+            pass
+
+    if loadedIds != None:
+        for entry in loadedIds[section]:
+            if id == entry["id"]:
+                returnString = entry["name"]
+                break
+
+    return returnString

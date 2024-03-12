@@ -100,8 +100,15 @@ def testHubPos():
     suspension.visualizePacket(packet)
     print("=== Hub pos test end ===")
 
+
+def testResolveId():
+    print("=== Hub pos test ===")
+    print(util.resolveId(70, "vehicles"))
+    print("=== Hub pos test end ===")
+
 if __name__ == "__main__":
     #testSteering()
     #testAccel()
     #testMenu()
-    testHubPos()
+    #testHubPos()
+    testResolveId()

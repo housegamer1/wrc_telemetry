@@ -1,1 +1,1 @@
-python src/main.py
+python src/main.py -c custom1_mod

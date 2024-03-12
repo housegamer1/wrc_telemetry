@@ -50,6 +50,7 @@ def main():
     parser.add_argument("-g", "--isgitbash", help="uses clear to clear screen to avoid flicker", default=False,required=False, action="store_true")
     args = parser.parse_args()
 
+    print("Args: " + str(args))
     connectToServer(args)
 
 if __name__ == "__main__":
