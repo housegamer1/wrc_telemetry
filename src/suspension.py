@@ -162,8 +162,8 @@ def visualizePacket(packet):
         global blockAvgCalc                        
         kilometerModulo = round((util.mToKm(distance) % 1), 1)
 
-        print("distance modulo: " + str(kilometerModulo))
-        print("blockAvgCalc: " + str(blockAvgCalc))
+        #print("distance modulo: " + str(kilometerModulo))
+        #print("blockAvgCalc: " + str(blockAvgCalc))
 
         #use this global var so we only calculate once and not for every packet where the player is at the kilometer mark +- 20 meters
         #if the player stopped there, it would calculate this every time. Only when the modulo goes to > 0.0 again, we can unblock the calculation.

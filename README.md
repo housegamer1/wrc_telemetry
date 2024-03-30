@@ -116,7 +116,7 @@ Make sure you place this in ```YourUser\Documents\My Games\WRC\telemetry\udp``` 
 For the time being, custom1 will remain the default value, as this will be present for every installation of the game. Launch the client with ```-c custom1_mod``` to get car and stage information.
 
 ## Known issues and TODOs
-* Replaying recorded telemetry data is not guaranteed to run at the correct speed
+* Replaying recorded telemetry data is not guaranteed to run at the correct speed. Therefore 0-100 measurements will be wrong in replays!
 * Accelerometer data provided by the game is not bound to the cars orientation. The provided vaules are relative to the fixed directions on the map. I am not sure if I can fix this on my own with the provided telemetry data. imo codies should fix this.
 * Limited to fixed structure configs. use ```custom1``` for now.
 * SLIP and LOCKUP indicators are based on the difference between GPS speed and transmission speed with a factor. Therefore both are more likely to be detected at lower speeds. Should compute based on the individually provided contact patch information.
