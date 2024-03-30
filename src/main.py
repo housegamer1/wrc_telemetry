@@ -15,6 +15,12 @@ def connectToServer(args):
     sock.bind((args.ip, args.port))
 
     interpTime = 0
+
+    #how long to wait until the next packet is handled.
+    #if this is smaller than the packet handling time taken, the programm will be behind what is happening in the game.
+    #the larger this number, the less responsive the ui will be.
+    packetHandlingDelay = 0.06 
+
     try:
         while True:
             if inout.replayMode == 0:
@@ -25,8 +31,16 @@ def connectToServer(args):
                     #try not to interpret every frame.
                     #if the whole function sleeps, the sleep will just create delay in the information
                     #so instead we keep receiving to pop from the socket but we do nothing with some of the packets
-                    if (recvTime - interpTime) > 0.05:
+                    if (recvTime - interpTime) > packetHandlingDelay:
+                        t1 = time.time()
                         interpret.interpretPacket(data, args)
+                        t2 = time.time()
+
+                        timeToHandlePacket = round(t2 - t1, 2)
+
+                        if timeToHandlePacket > packetHandlingDelay:
+                            print("interpreting packet took too long, cpu not sleeping!")
+                        #print("Packet took: " + str(timeToHandlePacket))
                         interpTime = recvTime
 
                 except socket.error:            

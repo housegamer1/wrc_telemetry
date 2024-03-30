@@ -43,12 +43,22 @@ minmax = {
     "maxBr":0,
     "minBr":0
 }
+wheelHubPositionMemory = {
+    "Fl" : [],
+    "Fr" : [],
+    "Bl" : [],
+    "Br" : []
+}
 
 def showCurrentAndMax(pos, wheel):
     global minmax
+    global wheelHubPositionMemory
+
     rpos = round(pos)
     
-    
+    #record all known values so we can later calculate the average
+    wheelHubPositionMemory[wheel].append(rpos)    
+
     max = minmax["max" + wheel]
     min = minmax["min" + wheel]
     newmaxColor = ""
@@ -70,8 +80,30 @@ def showCurrentAndMax(pos, wheel):
     returnstring = "\tNOW:" + posAdjust + str(rpos) + "\n"
     returnstring = returnstring + "\tMAX:" + maxAdjust + newmaxColor + str(max) + util.setcolor("white") + "\n"
     returnstring = returnstring + "\tMIN:"  + minAdjust + newminColor + str(min) + util.setcolor("white") + "\n"
+    returnstring = returnstring + "\tAVG:" + str(avgSuspensionPosition[wheel]) + "\n"
 
     return returnstring
+
+blockAvgCalc = False
+avgSuspensionPosition = {
+    "Fl" : 0,
+    "Fr" : 0,
+    "Bl" : 0,
+    "Br" : 0
+}
+
+def calcTravelAvg():
+    wheels = ["Fl", "Fr", "Bl", "Br"]
+    for wheel in wheels:
+        suspensionPositions = wheelHubPositionMemory[wheel]
+        length = len(suspensionPositions)
+
+        if length > 0:
+            avg = round(sum(suspensionPositions) / length)
+            avgSuspensionPosition[wheel] = avg
+
+        #reset the position memory, so that new avg calculations will be more usable for the driver. otherwise the value will pretty much never change
+        wheelHubPositionMemory[wheel] = []
 
 
 def visualizePacket(packet):
@@ -91,15 +123,15 @@ def visualizePacket(packet):
     posBl = round(packet["vehicle_hub_position_bl"] * 100)
     posBr = round(packet["vehicle_hub_position_br"] * 100)
 
-    if "stage_current_distance" in packet: #reset minmax if stagedistance is 0
+    if "stage_current_distance" in packet: 
         
-        #lets only allow resetting if the stage was started. i.e. distance > 0.
+        #reset minmax and wheel hub position counter if stagedistance is 0
+        
+        #lets only allow resetting if the stage was started previosly. i.e. distance > 0.
         #this stops the new maximum and new minimum color being constantly applied
         global stageStarted
         distance = packet["stage_current_distance"]
-
         
-
         if distance == 0 and stageStarted > 0:
             global minmax
             minmax = {
@@ -112,9 +144,37 @@ def visualizePacket(packet):
                     "maxBr":0,
                     "minBr":0
             }
+
+            global wheelHubPositionMemory
+            wheelHubPositionMemory = {
+                "Fl" : [],
+                "Fr" : [],
+                "Bl" : [],
+                "Br" : []
+            }
+
             stageStarted = 0
         elif distance > 0 and stageStarted == 0:
             stageStarted = distance
+
+
+        #calculate average suspension travel for every completed KM of stage
+        global blockAvgCalc                        
+        kilometerModulo = round((util.mToKm(distance) % 1), 1)
+
+        print("distance modulo: " + str(kilometerModulo))
+        print("blockAvgCalc: " + str(blockAvgCalc))
+
+        #use this global var so we only calculate once and not for every packet where the player is at the kilometer mark +- 20 meters
+        #if the player stopped there, it would calculate this every time. Only when the modulo goes to > 0.0 again, we can unblock the calculation.
+        
+        if kilometerModulo == 0.0 and not blockAvgCalc:
+            calcTravelAvg()
+            blockAvgCalc = True
+        elif kilometerModulo > 0.0:
+            blockAvgCalc = False
+            
+
 
     finalString = "Offset of wheel hub in wheel well in cm\n\n"
     posFlString = "\tFront Left\n"  + showCurrentAndMax(posFl, "Fl") + "\n" + _visHubPosition(posFl)

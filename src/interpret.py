@@ -30,6 +30,7 @@ def interpretPacket(data, args):
     #print("Number of exported fields: "+  str(len(bytesAsNumerical)))
 
     #TODO: read actual json config file, determine fields and automatically build packets based on that.
+    t1 = time.time()
     packet = {}
     if args.config == "custom1":
         packet = interpretCustom1(bytesAsNumerical, False)
@@ -38,8 +39,11 @@ def interpretPacket(data, args):
     elif args.config == "custom2":
         packet = interpretCustom2(bytesAsNumerical)
 
+    t2 = time.time()
+    t4 = 0
     if packet != {}:
         inout.clearScreen(args)
+        t4 = time.time()
 
         if inout.currentScreen == 1:
             dashboard.visualizePacket(packet, False)
@@ -53,6 +57,17 @@ def interpretPacket(data, args):
             science.printPacket(packet)
     else:
         print("unable to interpret packet")
+
+    t3 = time.time()
+
+    timeToInterpret = round(t2-t1, 2)
+    timeToDraw = round(t3-t2, 2)
+    timeToClear = round(t4-t2, 2)
+
+    #print("Time to interpret: " + str(timeToInterpret))
+    #print("Time to draw: " + str(timeToDraw))
+    #print("Time to clear screen: " + str(timeToClear))
+
 
     if inout.recordingStatus == 1:
         inout.logFrame(bytesAsNumerical)
