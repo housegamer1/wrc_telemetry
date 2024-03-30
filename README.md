@@ -120,10 +120,13 @@ For the time being, custom1 will remain the default value, as this will be prese
 * Accelerometer data provided by the game is not bound to the cars orientation. The provided vaules are relative to the fixed directions on the map. I am not sure if I can fix this on my own with the provided telemetry data. imo codies should fix this.
 * Limited to fixed structure configs. use ```custom1``` for now.
 * SLIP and LOCKUP indicators are based on the difference between GPS speed and transmission speed with a factor. Therefore both are more likely to be detected at lower speeds. Should compute based on the individually provided contact patch information.
-* Car and stage info is not available in the UDP telemetry. Could try to check if stage length works as a unique identifier.
+* <s>Car and stage info is not available in the UDP telemetry. Could try to check if stage length works as a unique identifier.</s> They added this to the telemetry, no longer relevant.
 * Can only scrub forwards through replays, going back is not supported
 * Transmission speed column in Dashboard view shifts when GPS speed exceeds 100 Km/h
 * Units only calculated in metric
 * Reaction to keyboard inputs is currently bound to package handling and is therefore not very responsive
 * Replays only available for the currently running config
 * <s>Add option to make the histo graph wider and remove the accelerometer graph as its not really useful with the data the telemetry provides</s>
+* Add maximum and average suspension travel speed
+* Add average suspension travel amount
+* Record and store max and min suspension travel amound as well as max suspension travel speed for each car on tarmac and non tarmac. Once all data is gathered, the tool can make more accurate statements about e.g. bottoming out
