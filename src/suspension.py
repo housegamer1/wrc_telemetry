@@ -156,29 +156,27 @@ def prepCatalogueUpdate():
     global surfaceType
     global minmax
 
-    minimum = minmax["minFl"]
-    maximum = minmax["maxFl"]
+    if currentCar != "":
 
-    print("current car: " + str(currentCar))
+        minimum = minmax["minFl"]
+        maximum = minmax["maxFl"]
 
-    currentCatalogue = inout.getSuspensionCatalogue()
-    print("Catalogue is: " + str(currentCatalogue))
+        currentCatalogue = inout.getSuspensionCatalogue()
 
-    for carEntry in currentCatalogue:
-        print("Car entry is: " + str(carEntry))
+        for carEntry in currentCatalogue:
 
-        if carEntry["car"] == currentCar:
-        #car exists. check if values for this surface are now more extreme
-            existingMin = int(carEntry[surfaceType + "Min"])
-            existingMax = int(carEntry[surfaceType + "Max"])
+            if carEntry["car"] == currentCar:
+            #car exists. check if values for this surface are now more extreme
+                existingMin = int(carEntry[surfaceType + "Min"])
+                existingMax = int(carEntry[surfaceType + "Max"])
 
-            if existingMin <= minimum and existingMax >= maximum:
-                return
+                if existingMin <= minimum and existingMax >= maximum:
+                    return
 
-            minimum = min(minimum, existingMin)
-            maximum = max(maximum, existingMax)               
+                minimum = min(minimum, existingMin)
+                maximum = max(maximum, existingMax)               
 
-    inout.updateSuspensionCatalogue(currentCar, surfaceType, minimum, maximum)
+        inout.updateSuspensionCatalogue(currentCar, surfaceType, minimum, maximum)
 
 def oncePerKmAction():
     calcTravelAvg()
