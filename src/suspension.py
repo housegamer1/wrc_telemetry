@@ -167,14 +167,16 @@ def prepCatalogueUpdate():
 
             if carEntry["car"] == currentCar:
             #car exists. check if values for this surface are now more extreme
-                existingMin = int(carEntry[surfaceType + "Min"])
-                existingMax = int(carEntry[surfaceType + "Max"])
 
-                if existingMin <= minimum and existingMax >= maximum:
-                    return
+                if surfaceType in carEntry:
+                    existingMin = int(carEntry[surfaceType + "Min"])
+                    existingMax = int(carEntry[surfaceType + "Max"])
 
-                minimum = min(minimum, existingMin)
-                maximum = max(maximum, existingMax)               
+                    if existingMin <= minimum and existingMax >= maximum:
+                        return
+
+                    minimum = min(minimum, existingMin)
+                    maximum = max(maximum, existingMax)
 
         inout.updateSuspensionCatalogue(currentCar, surfaceType, minimum, maximum)
 
