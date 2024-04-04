@@ -1,10 +1,10 @@
 import util
 import os
 import msvcrt
-import inout
 import time
 import interpret
 import ast
+import json
 
 
 currentScreen = 2
@@ -64,7 +64,7 @@ def clearScreen(args):
         print("\x1b[2J")
         print("\x1b[H")
         
-    inout.showMenu(args)
+    showMenu(args)
 
 def readInput(args):
     if msvcrt.kbhit():
@@ -222,3 +222,61 @@ def saveLogFile(args):
         file = open(filename, "w")
         file.write(logContents)
         file.close()
+
+def updateSuspensionCatalogue(car, surface, min, max):
+    catalogue = "SuspensionCatalogue.json"
+
+    if os.path.isfile(catalogue):
+        file = open(catalogue, "r")
+        content = json.loads(file.read())
+
+        carFound = False
+        for carEntry in content:
+            if carEntry["car"] == car:
+                carEntry[surface + "Min"] = min
+                carEntry[surface + "Max"] = max
+                carFound = True
+
+        if not carFound:
+            entry = {
+                "car" : car,
+                "name": util.resolveId(car, "vehicles"),
+                surface + "Min": min,
+                surface + "Max": max
+            }
+            content.append(entry)
+                    
+        file.close()
+        file = open(catalogue, "w")
+        #write modified content back
+        file.write(json.dumps(content))
+        file.close()
+
+    else:
+        #construct basic json to write:
+        jsondata = []
+        entry = {
+            "car" : car,
+            "name": util.resolveId(car, "vehicles"),
+            surface + "Min": min,
+            surface + "Max": max
+        }
+
+        jsondata.append(entry)
+
+        #write new file
+        file = open(catalogue, "a+")
+        file.write(json.dumps(jsondata))
+        file.close()
+
+
+def getSuspensionCatalogue():
+    catalogue = "SuspensionCatalogue.json"
+    content = []
+    
+    if os.path.isfile(catalogue):
+        file = open(catalogue, "r")
+        content = json.loads(file.read())
+        file.close()
+
+    return content

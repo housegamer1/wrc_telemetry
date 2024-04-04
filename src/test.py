@@ -106,9 +106,21 @@ def testResolveId():
     print(util.resolveId(70, "vehicles"))
     print("=== Hub pos test end ===")
 
+
+def testCatalogue():
+    print("=== Catalogue Test ===")
+
+    inout.updateSuspensionCatalogue(32, "Loose", -3, 8)
+    inout.updateSuspensionCatalogue(32, "Tarmac", -6, 4)
+    inout.updateSuspensionCatalogue(65, "Tarmac", -6, 4)
+    currentCatalogue = inout.getSuspensionCatalogue()
+    print("Catalogue is: " + str(currentCatalogue))
+    print("=== Catalogue Test end ===")
+
 if __name__ == "__main__":
     #testSteering()
     #testAccel()
     #testMenu()
     #testHubPos()
-    testResolveId()
+    #testResolveId()
+    testCatalogue()

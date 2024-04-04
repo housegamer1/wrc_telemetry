@@ -4,6 +4,7 @@ import interpret
 import argparse
 import inout
 import util
+import suspension
 
 def connectToServer(args):
 
@@ -45,6 +46,8 @@ def connectToServer(args):
 
                 except socket.error:            
                     inout.clearScreen(args)
+                    #when we lose packets, it might be the end of the stage (or game paused), so write out the data we gathered.
+                    suspension.prepCatalogueUpdate()
                     print(">>>    No packets received, sleeping")
                     time.sleep(0.25)
 

@@ -1,4 +1,5 @@
 import util
+import inout
 
 def _visHubPosition(pos):
     height = 21 #lets go from -20 to + 20. means we jump for every 2cm
@@ -106,7 +107,86 @@ def calcTravelAvg():
         wheelHubPositionMemory[wheel] = []
 
 
-def visualizePacket(packet):
+
+def resetStoredValues():
+    global minmax
+    minmax = {
+            "maxFl":0,
+            "minFl":0,
+            "maxFr":0,
+            "minFr":0,
+            "maxBl":0,
+            "minBl":0,
+            "maxBr":0,
+            "minBr":0
+    }
+
+    global wheelHubPositionMemory
+    wheelHubPositionMemory = {
+        "Fl" : [],
+        "Fr" : [],
+        "Bl" : [],
+        "Br" : []
+    }
+
+    global stageStarted
+    stageStarted = 0
+
+def setCarAndSurface(packet):
+    #for recording the suspension travel of every individual car
+    global currentCar
+    global surfaceType
+
+    if "vehicle_id" in packet and "location_id" in packet:
+        currentCar = packet["vehicle_id"]
+        currentLocation = packet["location_id"]
+
+        if currentLocation == 5 or currentLocation == 16 or currentLocation == 17 or currentLocation == 25 or currentLocation == 28 or currentLocation == 29:
+            #mediterraneo, croatia, monte carlo, japan, iberia, cer.
+            #we need to check this, because ride heights / actual suspension components and wheels are different for tarmac locations.
+            surfaceType = "Tarmac"
+        else:
+            surfaceType = "Loose"
+
+
+def prepCatalogueUpdate():
+    #for simplicity reasons we only track one wheel and assume all wheels have the same range of motion
+
+    global currentCar
+    global surfaceType
+    global minmax
+
+    minimum = minmax["minFl"]
+    maximum = minmax["maxFl"]
+
+    print("current car: " + str(currentCar))
+
+    currentCatalogue = inout.getSuspensionCatalogue()
+    print("Catalogue is: " + str(currentCatalogue))
+
+    for carEntry in currentCatalogue:
+        print("Car entry is: " + str(carEntry))
+
+        if carEntry["car"] == currentCar:
+        #car exists. check if values for this surface are now more extreme
+            existingMin = int(carEntry[surfaceType + "Min"])
+            existingMax = int(carEntry[surfaceType + "Max"])
+
+            if existingMin <= minimum and existingMax >= maximum:
+                return
+
+            minimum = min(minimum, existingMin)
+            maximum = max(maximum, existingMax)               
+
+    inout.updateSuspensionCatalogue(currentCar, surfaceType, minimum, maximum)
+
+def oncePerKmAction():
+    calcTravelAvg()
+    prepCatalogueUpdate()
+
+currentCar = ""
+surfaceType = ""
+def visualizePacket(packet, hide):
     requiredData = []
     requiredData.append("vehicle_hub_position_fl")
     requiredData.append("vehicle_hub_position_fr")
@@ -125,55 +205,40 @@ def visualizePacket(packet):
 
     if "stage_current_distance" in packet: 
         
-        #reset minmax and wheel hub position counter if stagedistance is 0
-        
-        #lets only allow resetting if the stage was started previosly. i.e. distance > 0.
-        #this stops the new maximum and new minimum color being constantly applied
         global stageStarted
         distance = packet["stage_current_distance"]
         
+        if currentCar == "":
+            #only need to set the car on stage starts
+            setCarAndSurface(packet)        
+
         if distance == 0 and stageStarted > 0:
-            global minmax
-            minmax = {
-                    "maxFl":0,
-                    "minFl":0,
-                    "maxFr":0,
-                    "minFr":0,
-                    "maxBl":0,
-                    "minBl":0,
-                    "maxBr":0,
-                    "minBr":0
-            }
+                #reset minmax and wheel hub position counter if stagedistance is 0        
+                #lets only allow resetting if the stage was started previosly. i.e. distance > 0.
+                #this stops the new maximum and new minimum color being constantly applied
 
-            global wheelHubPositionMemory
-            wheelHubPositionMemory = {
-                "Fl" : [],
-                "Fr" : [],
-                "Bl" : [],
-                "Br" : []
-            }
-
-            stageStarted = 0
+                prepCatalogueUpdate() #dont delete things if we hit restart, instead use the already gathered values.
+                resetStoredValues()
+                setCarAndSurface(packet) #could have switched to a different stage now.
         elif distance > 0 and stageStarted == 0:
+            #stage was started, detect it by using the distance.
+            #this way we can tell if we are a clean start or a restart
             stageStarted = distance
 
 
+
         #calculate average suspension travel for every completed KM of stage
-        global blockAvgCalc                        
-        kilometerModulo = round((util.mToKm(distance) % 1), 1)
-
-        #print("distance modulo: " + str(kilometerModulo))
-        #print("blockAvgCalc: " + str(blockAvgCalc))
-
         #use this global var so we only calculate once and not for every packet where the player is at the kilometer mark +- 20 meters
         #if the player stopped there, it would calculate this every time. Only when the modulo goes to > 0.0 again, we can unblock the calculation.
+        global blockAvgCalc                        
+        kilometerModulo = round((util.mToKm(distance) % 1), 1)
+            
         
         if kilometerModulo == 0.0 and not blockAvgCalc:
-            calcTravelAvg()
+            oncePerKmAction()
             blockAvgCalc = True
         elif kilometerModulo > 0.0:
             blockAvgCalc = False
-            
 
 
     finalString = "Offset of wheel hub in wheel well in cm\n\n"
@@ -182,8 +247,9 @@ def visualizePacket(packet):
     posBlString = "Back Left\n" + showCurrentAndMax(posBl, "Bl") + "\n" + _visHubPosition(posBl)
     posBrString = "Back Right\n" + showCurrentAndMax(posBr, "Br") + "\n" + _visHubPosition(posBr)
 
-    frontString = util.drawSideBySide(posFlString, posFrString)
-    backString = util.drawSideBySide(posBlString, posBrString)
+    if not hide:
+        frontString = util.drawSideBySide(posFlString, posFrString)
+        backString = util.drawSideBySide(posBlString, posBrString)
 
-    finalString = finalString + util.drawSideBySide(frontString, backString)    
-    print(finalString)
+        finalString = finalString + util.drawSideBySide(frontString, backString)    
+        print(finalString)
