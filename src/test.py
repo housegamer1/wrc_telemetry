@@ -110,9 +110,10 @@ def testResolveId():
 def testCatalogue():
     print("=== Catalogue Test ===")
 
-    inout.updateSuspensionCatalogue(32, "Loose", -3, 8)
-    inout.updateSuspensionCatalogue(32, "Tarmac", -6, 4)
-    inout.updateSuspensionCatalogue(65, "Tarmac", -6, 4)
+    inout.updateSuspensionCatalogue(32, "Loose", -3, 8, 0, 12)
+    inout.updateSuspensionCatalogue(32, "Tarmac", -6, 4, 3, 5)
+    inout.updateSuspensionCatalogue(65, "Tarmac", -6, 4, 6 ,1)
+    inout.updateSuspensionCatalogue(4, "Loose", 0, 4, 0 ,0)
     currentCatalogue = inout.getSuspensionCatalogue()
     print("Catalogue is: " + str(currentCatalogue))
     print("=== Catalogue Test end ===")

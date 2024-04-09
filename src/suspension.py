@@ -150,7 +150,7 @@ def setCarAndSurface(packet):
 
 
 def prepCatalogueUpdate():
-    #for simplicity reasons we only track one wheel and assume all wheels have the same range of motion
+    #for simplicity reasons we only track one wheel front and back and assume all wheels on the same axle have the same range of motion
 
     global currentCar
     global surfaceType
@@ -158,8 +158,10 @@ def prepCatalogueUpdate():
 
     if currentCar != "":
 
-        minimum = minmax["minFl"]
-        maximum = minmax["maxFl"]
+        minimumFront = minmax["minFl"]
+        maximumFront = minmax["maxFl"]
+        minimumBack = minmax["minBr"]
+        maximumBack = minmax["maxBr"]
 
         currentCatalogue = inout.getSuspensionCatalogue()
 
@@ -168,17 +170,21 @@ def prepCatalogueUpdate():
             if carEntry["car"] == currentCar:
             #car exists. check if values for this surface are now more extreme
 
-                if surfaceType in carEntry:
-                    existingMin = int(carEntry[surfaceType + "Min"])
-                    existingMax = int(carEntry[surfaceType + "Max"])
+                if surfaceType in carEntry: #should work as substring match
+                    existingMinFront = int(carEntry[surfaceType + "MinF"])
+                    existingMaxFront = int(carEntry[surfaceType + "MaxF"])
+                    existingMinBack = int(carEntry[surfaceType + "MinB"])
+                    existingMaxBack = int(carEntry[surfaceType + "MaxB"])
 
-                    if existingMin <= minimum and existingMax >= maximum:
+                    if existingMinFront <= minimumFront and existingMaxFront >= maximumFront and existingMinBack <= minimumBack and existingMaxBack >= maximumBack:
                         return
 
-                    minimum = min(minimum, existingMin)
-                    maximum = max(maximum, existingMax)
+                    minimumFront = min(minimumFront, existingMinFront)
+                    maximumFront = max(maximumFront, existingMaxFront)
+                    minimumBack = min(minimumBack, existingMinBack)
+                    maximumBack = max(maximumBack, existingMaxBack)
 
-        inout.updateSuspensionCatalogue(currentCar, surfaceType, minimum, maximum)
+        inout.updateSuspensionCatalogue(currentCar, surfaceType, minimumFront, maximumFront, minimumBack, maximumBack)
 
 def oncePerKmAction():
     calcTravelAvg()
