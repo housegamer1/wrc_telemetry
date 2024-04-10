@@ -129,4 +129,4 @@ For the time being, custom1 will remain the default value, as this will be prese
 * <s>Add option to make the histo graph wider and remove the accelerometer graph as its not really useful with the data the telemetry provides</s>
 * Add maximum and average suspension travel speed
 * <s>Add average suspension travel amount</s>
-* <s>Record and store max and min suspension travel amound as well as max suspension travel speed for each car on tarmac and non tarmac.</s> Once all data is gathered, the tool can make more accurate statements about e.g. bottoming out
+* <s>Record and store max and min suspension travel amound as well as max suspension travel speed for each car on tarmac and non tarmac. Once all data is gathered, the tool can make more accurate statements about e.g. bottoming out</s>
