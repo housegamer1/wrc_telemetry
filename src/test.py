@@ -93,11 +93,14 @@ def testHubPos():
         "vehicle_hub_position_fl" : 0.0,
         "vehicle_hub_position_fr" : 0.2,
         "vehicle_hub_position_bl" : -0.19,
-        "vehicle_hub_position_br" : -0.12
+        "vehicle_hub_position_br" : -0.12,
+        "vehicle_id" :  106,
+        "location_id" : 13,
+        "stage_current_distance": 0
     }
 
     print("=== Hub pos test ===")
-    suspension.visualizePacket(packet)
+    suspension.visualizePacket(packet, False)
     print("=== Hub pos test end ===")
 
 
@@ -122,6 +125,6 @@ if __name__ == "__main__":
     #testSteering()
     #testAccel()
     #testMenu()
-    #testHubPos()
+    testHubPos()
     #testResolveId()
-    testCatalogue()
+    #testCatalogue() #dont call unless you made a backup of suspensionCatalogue.json, will introduce fake values 

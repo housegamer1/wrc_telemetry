@@ -1,9 +1,23 @@
 import util
 import inout
 
-def _visHubPosition(pos):
+def _visHubPosition(pos, axle):
     height = 21 #lets go from -20 to + 20. means we jump for every 2cm
-    graph = ["\t .\n" for x in range(height)]
+    graph = [util.setcolor("white") + "\t |\n" for x in range(height)]
+
+    currentCatalogue = inout.getSuspensionCatalogue()
+
+    if currentCar != "" and surfaceType != "":
+        for entry in currentCatalogue:
+            if entry["car"] == currentCar:
+                if pos <= int(entry[surfaceType + "Min" + axle]):
+                    #(close to) no road contact!
+                    graph = [util.setcolor("blue") + "\t |\n" + util.setcolor("white") for x in range(height)]
+                    break
+                elif pos >= int(entry[surfaceType + "Max" + axle] -1):
+                    #(close to) bottoming out!
+                    graph = [util.setcolor("red") + "\t |\n" + util.setcolor("white") for x in range(height)]
+                    break
 
     counter = 0
     value = 20
@@ -157,7 +171,6 @@ def prepCatalogueUpdate():
     global minmax
 
     if currentCar != "":
-
         minimumFront = minmax["minFl"]
         maximumFront = minmax["maxFl"]
         minimumBack = minmax["minBr"]
@@ -168,9 +181,9 @@ def prepCatalogueUpdate():
         for carEntry in currentCatalogue:
 
             if carEntry["car"] == currentCar:
-            #car exists. check if values for this surface are now more extreme
+                #car exists. check if values for this surface are now more extreme
 
-                if surfaceType in carEntry: #should work as substring match
+                if surfaceType + "MinF" in carEntry:
                     existingMinFront = int(carEntry[surfaceType + "MinF"])
                     existingMaxFront = int(carEntry[surfaceType + "MaxF"])
                     existingMinBack = int(carEntry[surfaceType + "MinB"])
@@ -247,11 +260,11 @@ def visualizePacket(packet, hide):
             blockAvgCalc = False
 
 
-    finalString = "Offset of wheel hub in wheel well in cm\n\n"
-    posFlString = "\tFront Left\n"  + showCurrentAndMax(posFl, "Fl") + "\n" + _visHubPosition(posFl)
-    posFrString = "Front Right\n" + showCurrentAndMax(posFr, "Fr") + "\n" + _visHubPosition(posFr)
-    posBlString = "Back Left\n" + showCurrentAndMax(posBl, "Bl") + "\n" + _visHubPosition(posBl)
-    posBrString = "Back Right\n" + showCurrentAndMax(posBr, "Br") + "\n" + _visHubPosition(posBr)
+    finalString = "Offset of wheel hub in wheel well in cm. " + util.setcolor("blue") + "|" + util.setcolor("white") +" = No road contact, " + util.setcolor("red") + "|" + util.setcolor("white") + " = Bottoming out (program learns with time)\n\n"
+    posFlString = "\tFront Left\n"  + showCurrentAndMax(posFl, "Fl") + "\n" + _visHubPosition(posFl, "F")
+    posFrString = "Front Right\n" + showCurrentAndMax(posFr, "Fr") + "\n" + _visHubPosition(posFr, "F")
+    posBlString = "Back Left\n" + showCurrentAndMax(posBl, "Bl") + "\n" + _visHubPosition(posBl, "B")
+    posBrString = "Back Right\n" + showCurrentAndMax(posBr, "Br") + "\n" + _visHubPosition(posBr, "B")
 
     if not hide:
         frontString = util.drawSideBySide(posFlString, posFrString)
