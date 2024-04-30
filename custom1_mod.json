@@ -80,15 +80,9 @@
 				"stage_shakedown",
 				"game_mode",
 				"stage_previous_split_time",
-				"stage_progress",
-				"stage_result_time",
-				"stage_result_time_penalty",
-				"stage_result_status",
 				"vehicle_cluster_abs",
 				"vehicle_tyre_state_bl",
-				"vehicle_tyre_state_br",
-				"vehicle_tyre_state_fl",
-				"vehicle_tyre_state_fr"
+				"vehicle_tyre_state_br"
 			]
 		}
 	]
