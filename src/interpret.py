@@ -50,11 +50,14 @@ def interpretPacket(data, args):
         elif inout.currentScreen == 2:
             dashboard.visualizePacket(packet, True)
         elif inout.currentScreen == 3:
-            suspension.visualizePacket(packet)
+            suspension.visualizePacket(packet, False)
         elif inout.currentScreen == 4:
             raw.printPacket(packet)
         elif inout.currentScreen == 5:
             science.printPacket(packet)
+
+        if inout.currentScreen != 3:
+            suspension.visualizePacket(packet, True) #run the suspension code but hide the visuals, so we can record min and max values for our catalogue
     else:
         print("unable to interpret packet")
 
