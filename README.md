@@ -100,7 +100,7 @@ Might make it more dynamic in the future.<br><br>
 Make sure to set ```bEnabled``` for ```custom1_mod``` to ```true``` (game restart needed).<br>
 ```
 {
-				"structure": "custom1",
+				"structure": "custom1_mod",
 				"packet": "session_update",
 				"ip": "127.0.0.1",
 				"port": 20777,
