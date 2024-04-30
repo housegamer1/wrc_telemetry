@@ -155,7 +155,7 @@ def _visTireState(packet):
     blColor = _applyTireStatusColor(statusBl)
 
     returnstring = "FL [" + flColor + statusFl + util.setcolor("white") +"]\t FR [" + frColor + statusFr + util.setcolor("white") + "]\n"
-    returnstring = returnstring + "RL [" + blColor + statusBl + util.setcolor("white") + "]\t RR [" + brColor + statusBr + util.setcolor("white") + "]"
+    returnstring = returnstring + "\t\tRL [" + blColor + statusBl + util.setcolor("white") + "]\t RR [" + brColor + statusBr + util.setcolor("white") + "]"
     
     return returnstring
 

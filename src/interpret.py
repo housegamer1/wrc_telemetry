@@ -298,39 +298,43 @@ def interpretCustom1(bytesAsNumerical, modifiedCustom1):
 
         #Below is from update 1.8.0
         #Loading a replay from an older version would crash here, so we need to do a size check
-        if len(bytesAsNumerical) > 270:
+        if len(bytesAsNumerical) > 248:
 
             #game_mode                      1 Byte uint8: id
             packet["game_mode"] = util.resolveIntValue(bytesAsNumerical[248:249])
 
             #stage_previous_split_time      4 Bytes float32: in s
             packet["stage_previous_split_time"] = util.resolveFloatValue(bytesAsNumerical[249:253])
-            
-            #stage_progress                 4 Bytes float32: in % 0-1        
-            packet["stage_progress"] = util.resolveFloatValue(bytesAsNumerical[253:257])
 
-            #stage_result_time              4 Bytes float32: in s
-            packet["stage_result_time"] = util.resolveFloatValue(bytesAsNumerical[257:261])
-
-            #stage_result_time_penalty      4 Bytes float32: in s
-            packet["stage_result_time_penalty"] = util.resolveFloatValue(bytesAsNumerical[261:265])
-
-            #stage_result_status            1 Byte uint8: id
-            packet["stage_result_status"] = util.resolveIntValue(bytesAsNumerical[265:266])
-
-            #vehicle_cluster_abs            1 Byte boolean
-            packet["vehicle_cluster_abs"] = util.resolveBoolean(bytesAsNumerical[266:267])
+             #vehicle_cluster_abs            1 Byte boolean
+            packet["vehicle_cluster_abs"] = util.resolveBoolean(bytesAsNumerical[253:254])
 
             #vehicle_tyre_state_bl          1 Byte uint8: id
-            packet["vehicle_tyre_state_bl"] = util.resolveIntValue(bytesAsNumerical[267:268])
+            packet["vehicle_tyre_state_bl"] = util.resolveIntValue(bytesAsNumerical[254:255])
 
             #vehicle_tyre_state_br          1 Byte uint8: id
-            packet["vehicle_tyre_state_br"] = util.resolveIntValue(bytesAsNumerical[268:269])
+            packet["vehicle_tyre_state_br"] = util.resolveIntValue(bytesAsNumerical[255:256])
             
             #vehicle_tyre_state_fl          1 Byte uint8: id
-            packet["vehicle_tyre_state_fl"] = util.resolveIntValue(bytesAsNumerical[269:270])
+            #packet["vehicle_tyre_state_fl"] = util.resolveIntValue(bytesAsNumerical[])
+            packet["vehicle_tyre_state_fl"] = "1.8.0 Buggy" #for now, just so we get the visuals in the dashboard
 
             #vehicle_tyre_state_fr          1 Byte uint8: id
-            packet["vehicle_tyre_state_fr"] = util.resolveIntValue(bytesAsNumerical[270:271])
+            #packet["vehicle_tyre_state_fr"] = util.resolveIntValue(bytesAsNumerical[])
+            packet["vehicle_tyre_state_fr"] = "1.8.0 Buggy" #for now, just so we get the visuals in the dashboard
+
+            #stage_progress                 4 Bytes float32: in % 0-1        
+            #packet["stage_progress"] = util.resolveFloatValue(bytesAsNumerical[])
+            
+            #stage_result_time              4 Bytes float32: in s
+            #packet["stage_result_time"] = util.resolveFloatValue(bytesAsNumerical[])
+
+            #stage_result_time_penalty      4 Bytes float32: in s
+            #packet["stage_result_time_penalty"] = util.resolveFloatValue(bytesAsNumerical[])
+
+            #stage_result_status            1 Byte uint8: id
+            #packet["stage_result_status"] = util.resolveIntValue(bytesAsNumerical[])
+
+           
 
     return packet
