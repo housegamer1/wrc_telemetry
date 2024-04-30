@@ -122,7 +122,7 @@ For the time being, custom1 will remain the default value, as this will be prese
 * SLIP and LOCKUP indicators are based on the difference between GPS speed and transmission speed with a factor. Therefore both are more likely to be detected at lower speeds. Should compute based on the individually provided contact patch information.
 * <s>Car and stage info is not available in the UDP telemetry. Could try to check if stage length works as a unique identifier.</s> They added this to the telemetry, no longer relevant.
 * Can only scrub forwards through replays, going back is not supported
-* Transmission speed column in Dashboard view shifts when GPS speed exceeds 100 Km/h
+* <s>Transmission speed column in Dashboard view shifts when GPS speed exceeds 100 Km/h</s>
 * Units only calculated in metric
 * Reaction to keyboard inputs is currently bound to package handling and is therefore not very responsive
 * Replays only available for the currently running config
