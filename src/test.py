@@ -121,10 +121,35 @@ def testCatalogue():
     print("Catalogue is: " + str(currentCatalogue))
     print("=== Catalogue Test end ===")
 
+
+def testTireStatus():
+
+    #need this for ansi colors
+    class Arg():
+        pass
+    args = Arg()
+    args.isgitbash = True
+    inout.clearScreen(args)
+
+    packet = {
+        "vehicle_tyre_state_bl" : 0,
+        "vehicle_tyre_state_br" : 1,
+        "vehicle_tyre_state_fl" : 2,
+        "vehicle_tyre_state_fr" : 3,
+        "vehicle_id" :  106,
+        "location_id" : 13,
+        "stage_current_distance": 0
+    }
+
+    print("=== Hub pos test ===")
+    print(dashboard._visTireState(packet))
+    print("=== Hub pos test end ===")
+
 if __name__ == "__main__":
     #testSteering()
     #testAccel()
     #testMenu()
-    testHubPos()
+    #testHubPos()
     #testResolveId()
     #testCatalogue() #dont call unless you made a backup of suspensionCatalogue.json, will introduce fake values 
+    testTireStatus()
