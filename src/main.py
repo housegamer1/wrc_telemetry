@@ -26,7 +26,7 @@ def connectToServer(args):
         while True:
             if inout.replayMode == 0:
                 try:
-                    data = sock.recvfrom(256)[0] #TODO: figure out dynamic size?
+                    data = sock.recvfrom(512)[0] #TODO: figure out dynamic size?
                     recvTime = time.time()
                     
                     #try not to interpret every frame.

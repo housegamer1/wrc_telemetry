@@ -316,24 +316,24 @@ def interpretCustom1(bytesAsNumerical, modifiedCustom1):
             packet["vehicle_tyre_state_br"] = util.resolveIntValue(bytesAsNumerical[255:256])
             
             #vehicle_tyre_state_fl          1 Byte uint8: id
-            #packet["vehicle_tyre_state_fl"] = util.resolveIntValue(bytesAsNumerical[])
-            packet["vehicle_tyre_state_fl"] = "1.8.0 Buggy" #for now, just so we get the visuals in the dashboard
+            packet["vehicle_tyre_state_fl"] = util.resolveIntValue(bytesAsNumerical[256:257])
+            #packet["vehicle_tyre_state_fl"] = "1.8.0 Buggy" #for now, just so we get the visuals in the dashboard
 
             #vehicle_tyre_state_fr          1 Byte uint8: id
-            #packet["vehicle_tyre_state_fr"] = util.resolveIntValue(bytesAsNumerical[])
-            packet["vehicle_tyre_state_fr"] = "1.8.0 Buggy" #for now, just so we get the visuals in the dashboard
+            packet["vehicle_tyre_state_fr"] = util.resolveIntValue(bytesAsNumerical[257:258])
+            #packet["vehicle_tyre_state_fr"] = "1.8.0 Buggy" #for now, just so we get the visuals in the dashboard
 
             #stage_progress                 4 Bytes float32: in % 0-1        
-            #packet["stage_progress"] = util.resolveFloatValue(bytesAsNumerical[])
+            packet["stage_progress"] = util.resolveFloatValue(bytesAsNumerical[258:262])
             
             #stage_result_time              4 Bytes float32: in s
-            #packet["stage_result_time"] = util.resolveFloatValue(bytesAsNumerical[])
+            packet["stage_result_time"] = util.resolveFloatValue(bytesAsNumerical[262:266])
 
             #stage_result_time_penalty      4 Bytes float32: in s
-            #packet["stage_result_time_penalty"] = util.resolveFloatValue(bytesAsNumerical[])
+            packet["stage_result_time_penalty"] = util.resolveFloatValue(bytesAsNumerical[266:270])
 
             #stage_result_status            1 Byte uint8: id
-            #packet["stage_result_status"] = util.resolveIntValue(bytesAsNumerical[])
+            packet["stage_result_status"] = util.resolveIntValue(bytesAsNumerical[270:271])
 
            
 

@@ -82,7 +82,13 @@
 				"stage_previous_split_time",
 				"vehicle_cluster_abs",
 				"vehicle_tyre_state_bl",
-				"vehicle_tyre_state_br"
+				"vehicle_tyre_state_br",
+				"vehicle_tyre_state_fl",
+				"vehicle_tyre_state_fr",
+				"stage_progress",
+				"stage_result_time",
+				"stage_result_time_penalty",
+				"stage_result_status"
 			]
 		}
 	]
