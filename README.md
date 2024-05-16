@@ -94,13 +94,13 @@ Replays are saved to ```logs/``` once you press ```R``` again. They are named af
 Check out YourUser\Documents\My Games\WRC\telemetry.<br>
 Located in that directory is ```config.json```, which lists the different default configs for the telemetry.<br>
 The game ships with a few example configs called ```wrc``` and ```wrc_experimental```, and a config called ```custom1```.<br>
-This is the config the client is currently written for (essentially it is the same as ```wrc```).<br>
+The client is currently written for ```custom1_mod```.<br>
 Might make it more dynamic in the future.<br><br>
 
-Make sure to set ```bEnabled``` for ```custom1``` to ```true``` (game restart needed).<br>
+Make sure to set ```bEnabled``` for ```custom1_mod``` to ```true``` (game restart needed).<br>
 ```
 {
-				"structure": "custom1",
+				"structure": "custom1_mod",
 				"packet": "session_update",
 				"ip": "127.0.0.1",
 				"port": 20777,
@@ -118,11 +118,11 @@ For the time being, custom1 will remain the default value, as this will be prese
 ## Known issues and TODOs
 * Replaying recorded telemetry data is not guaranteed to run at the correct speed. Therefore 0-100 measurements will be wrong in replays!
 * Accelerometer data provided by the game is not bound to the cars orientation. The provided vaules are relative to the fixed directions on the map. I am not sure if I can fix this on my own with the provided telemetry data. imo codies should fix this.
-* Limited to fixed structure configs. use ```custom1``` for now.
+* Limited to fixed structure configs. use ```custom1_mod``` for now.
 * SLIP and LOCKUP indicators are based on the difference between GPS speed and transmission speed with a factor. Therefore both are more likely to be detected at lower speeds. Should compute based on the individually provided contact patch information.
 * <s>Car and stage info is not available in the UDP telemetry. Could try to check if stage length works as a unique identifier.</s> They added this to the telemetry, no longer relevant.
 * Can only scrub forwards through replays, going back is not supported
-* Transmission speed column in Dashboard view shifts when GPS speed exceeds 100 Km/h
+* <s>Transmission speed column in Dashboard view shifts when GPS speed exceeds 100 Km/h</s>
 * Units only calculated in metric
 * Reaction to keyboard inputs is currently bound to package handling and is therefore not very responsive
 * Replays only available for the currently running config

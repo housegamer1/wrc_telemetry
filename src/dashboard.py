@@ -138,6 +138,39 @@ def _visBrakeTemp(packet):
 
     return returnstring
 
+def _visTireState(packet):
+    fr = packet["vehicle_tyre_state_fr"]
+    fl = packet["vehicle_tyre_state_fl"]
+    br = packet["vehicle_tyre_state_br"]
+    bl = packet["vehicle_tyre_state_bl"]
+
+    statusFr = util.resolveId(fr, "vehicle_tyre_state")
+    statusFl = util.resolveId(fl, "vehicle_tyre_state")
+    statusBr = util.resolveId(br, "vehicle_tyre_state")
+    statusBl = util.resolveId(bl, "vehicle_tyre_state")
+
+    frColor = _applyTireStatusColor(statusFr)
+    flColor = _applyTireStatusColor(statusFl)
+    brColor = _applyTireStatusColor(statusBr)
+    blColor = _applyTireStatusColor(statusBl)
+
+    returnstring = "FL [" + flColor + statusFl + util.setcolor("white") +"]\t FR [" + frColor + statusFr + util.setcolor("white") + "]\n"
+    returnstring = returnstring + "\t\tRL [" + blColor + statusBl + util.setcolor("white") + "]\t RR [" + brColor + statusBr + util.setcolor("white") + "]"
+    
+    return returnstring
+
+def _applyTireStatusColor(status):
+    if status == "undamaged":
+        return util.setcolor("green")
+    elif status == "punctured":
+        return util.setcolor("yellow")
+    elif status == "burst":
+        return util.setcolor("red")
+    
+    #shouldnt happen
+    return util.setcolor("white")
+
+
 def _pickCharToDraw(dp, oldDp):
     chars = {
         "throttle": "_",
@@ -364,13 +397,23 @@ def visualizePacket(packet, fancy):
         elif transspeed < gpsspeed * 0.5: 
             slip = util.setcolor("purple") + "**LOCKUP**"+ util.setcolor("white") 
 
-        printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\t\t"
+        if packet["vehicle_speed"] >= 100:
+            printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\t" #otherwise it pops to the right when we go over 100.
+        else:
+            printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\t\t"
+
         printstring = printstring + ">>>   Trans Speed:\t" + str(packet["vehicle_transmission_speed"]) + " Km/h  " + slip + "\n"
         
 
-    if "vehicle_brake_temperature_bl" in packet and "vehicle_brake_temperature_br" in packet and "vehicle_brake_temperature_fl" in packet and "vehicle_brake_temperature_fr" in packet:
-        printstring = printstring + ">>>   Brake Temp:\t" + _visBrakeTemp(packet) + "\n\n"
+    tireString = ""
+    if "vehicle_tyre_state_bl" in packet and "vehicle_tyre_state_br" in packet and "vehicle_tyre_state_fl" in packet and "vehicle_tyre_state_fr" in packet:
+        tireString = "Tire status:\t" + _visTireState(packet)
 
+    brakeString = ""
+    if "vehicle_brake_temperature_bl" in packet and "vehicle_brake_temperature_br" in packet and "vehicle_brake_temperature_fl" in packet and "vehicle_brake_temperature_fr" in packet:
+        brakeString = ">>>   Brake Temp:\t" + _visBrakeTemp(packet)
+
+    printstring = printstring + util.drawSideBySide(brakeString, tireString) + "\n\n"
 
     printstring = printstring + ">>>   Press (T) to toggle accelerometer\n"
     histoString = ""
