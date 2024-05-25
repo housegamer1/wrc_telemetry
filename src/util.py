@@ -143,3 +143,6 @@ def resolveId(id, section):
                 break
 
     return returnString
+
+def cleanGamemode(gamemode):
+    return gamemode.replace("_", " ").title() #capitalizes every words first letter

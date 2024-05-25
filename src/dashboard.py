@@ -350,6 +350,7 @@ def visualizePacket(packet, fancy):
     carclass = ""
     location = ""
     stage = ""
+    gamemode = ""
 
     if "vehicle_id" in packet:
         car = util.resolveId(packet["vehicle_id"], "vehicles")
@@ -360,8 +361,11 @@ def visualizePacket(packet, fancy):
     if "route_id" in packet:
         stage = util.resolveId(packet["route_id"], "routes")
 
-    if car != "" or location != "" or stage != "":
-        printstring = printstring + car + " | " + location + " " + stage + "\n\n"
+    if "game_mode" in packet:
+        gamemode = util.cleanGamemode(util.resolveId(packet["game_mode"], "game_mode"))
+
+    if car != "" or location != "" or stage != "" or gamemode != "":
+        printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode + "\n\n"
 
     if "vehicle_throttle" in packet:
         printstring = printstring + ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\t"
