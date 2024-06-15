@@ -146,3 +146,9 @@ def resolveId(id, section):
 
 def cleanGamemode(gamemode):
     return gamemode.replace("_", " ").title() #capitalizes every words first letter
+
+def roundToNearest(value, nearest):
+    return nearest * round(value / nearest)
+
+def clamp(n, smallest, largest):
+    return max(smallest, min(n, largest))
