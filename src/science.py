@@ -65,9 +65,8 @@ def measureGforce(packet):
         gear = {}
         if currentGear in powerband:
             gear = powerband[currentGear]
-            if not rpm in gear:
-                gear[rpm] = accelCombined
-                powerband[currentGear] = gear
+            gear[rpm] = accelCombined
+            powerband[currentGear] = gear
              
         else:
             gear[rpm] = accelCombined
@@ -75,11 +74,11 @@ def measureGforce(packet):
 
     gforceString = "Gear: " + str(currentGear) + ", G: " + str(accelCombined) + "\n"
     if powerband != {}:
-        gforceString = gforceString + visualizeGforce(maxrpm,rpmAccuracy, currentGear)
+        gforceString = gforceString + visualizeGforce(maxrpm,rpmAccuracy, currentGear, rpm)
 
     return gforceString
 
-def visualizeGforce(maxrpm, rpmAccuracy, currentGear):
+def visualizeGforce(maxrpm, rpmAccuracy, currentGear, currentRpm):
     global powerband
 
     rpmRange = round(maxrpm / rpmAccuracy)
@@ -93,6 +92,10 @@ def visualizeGforce(maxrpm, rpmAccuracy, currentGear):
         graph[yAxis -1][entry -1] = "_"
         graph[0][entry -1] = "_"
  
+    currentRpmColumn = util.clamp(round(currentRpm / rpmAccuracy), 0, rpmRange -1)
+    graph[0][currentRpmColumn] = util.setcolor("red") + "_" + util.setcolor("white")
+    graph[yAxis -1][currentRpmColumn] = util.setcolor("red") + "_" + util.setcolor("white")
+
     if currentGear in powerband:
         gear = powerband[currentGear]
         for rpm in gear:
