@@ -13,6 +13,7 @@ replayMode = 0
 selected = 0
 skipAhead = 0
 toggleAccelerometer = 0
+togglePowerband = 0
 def showMenu(args):
     readInput(args)
 
@@ -80,6 +81,7 @@ def readInput(args):
         global selected
         global skipAhead
         global toggleAccelerometer
+        global togglePowerband
 
         if num == 49: #1 button
             currentScreen = 1
@@ -125,11 +127,17 @@ def readInput(args):
         elif num == 77: #right arrow
             skipAhead = 1
 
-        elif num == 116 and currentScreen == 2: #t button
-            if toggleAccelerometer == 1:
-                toggleAccelerometer = 0
-            else:
-                toggleAccelerometer = 1
+        elif num == 116: #t button
+            if currentScreen == 2:
+                if toggleAccelerometer == 1:
+                    toggleAccelerometer = 0
+                else:
+                    toggleAccelerometer = 1
+            elif currentScreen == 5:
+                if togglePowerband == 1:
+                    togglePowerband = 0
+                else:
+                    togglePowerband = 1
 
 cursorPos = 0
 def showLoadMenu(args):
