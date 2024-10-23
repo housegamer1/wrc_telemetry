@@ -130,3 +130,4 @@ For the time being, custom1 will remain the default value, as this will be prese
 * Add maximum and average suspension travel speed
 * <s>Add average suspension travel amount</s>
 * <s>Record and store max and min suspension travel amound as well as max suspension travel speed for each car on tarmac and non tarmac. Once all data is gathered, the tool can make more accurate statements about e.g. bottoming out</s>
+* Maybe i want to make a database to track all the times you set across all gamemodes with all cars? unfortunately the game does not export weather info.....
