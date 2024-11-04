@@ -375,6 +375,5 @@ def updatePBTable(packet):
             with open(table, "w", encoding="utf-16", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerows(cleanrows)
-            print("ROWS: " + str(cleanrows))
-            print("\n" + util.setcolor("green") + "Done" + util.setcolor("white"))
+
 
