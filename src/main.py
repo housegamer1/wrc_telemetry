@@ -20,7 +20,9 @@ def connectToServer(args):
     #how long to wait until the next packet is handled.
     #if this is smaller than the packet handling time taken, the programm will be behind what is happening in the game.
     #the larger this number, the less responsive the ui will be.
-    packetHandlingDelay = 0.06 
+    packetHandlingDelay = 0.06
+    latestPacket = {}
+    lastPackageUsedToUpdate = None
 
     try:
         while True:
@@ -28,13 +30,16 @@ def connectToServer(args):
                 try:
                     data = sock.recvfrom(512)[0] #TODO: figure out dynamic size?
                     recvTime = time.time()
-                    
+
                     #try not to interpret every frame.
                     #if the whole function sleeps, the sleep will just create delay in the information
                     #so instead we keep receiving to pop from the socket but we do nothing with some of the packets
                     if (recvTime - interpTime) > packetHandlingDelay:
                         t1 = time.time()
-                        interpret.interpretPacket(data, args)
+                        packet = interpret.interpretPacket(data, args)
+                        if packet != {}:
+                            latestPacket = packet.copy()
+
                         t2 = time.time()
 
                         timeToHandlePacket = round(t2 - t1, 2)
@@ -44,11 +49,17 @@ def connectToServer(args):
                         #print("Packet took: " + str(timeToHandlePacket))
                         interpTime = recvTime
 
-                except socket.error:            
+                except socket.error:
                     inout.clearScreen(args)
                     #when we lose packets, it might be the end of the stage (or game paused), so write out the data we gathered.
                     suspension.prepCatalogueUpdate()
+
+                    if latestPacket != lastPackageUsedToUpdate:
+                        inout.updatePBTable(latestPacket)
+                        lastPackageUsedToUpdate = latestPacket.copy()
+
                     print(">>>    No packets received, sleeping")
+                    print("\nLatest Packet:\n" + str(latestPacket))
                     time.sleep(0.25)
 
             else:

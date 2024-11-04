@@ -5,7 +5,8 @@ import time
 import interpret
 import ast
 import json
-
+import csv
+import datetime
 
 currentScreen = 2
 recordingStatus = 0
@@ -64,7 +65,7 @@ def clearScreen(args):
         #os.system("cls")
         print("\x1b[2J")
         print("\x1b[H")
-        
+
     showMenu(args)
 
 def readInput(args):
@@ -72,7 +73,7 @@ def readInput(args):
         getch = msvcrt.getch()
         num = ord(getch)
         #print("key ord is:" + str(num))
-    
+
 
         global currentScreen
         global recordingStatus
@@ -101,7 +102,7 @@ def readInput(args):
         elif num == 113: #q button
             util.quit(args)
 
-        elif num == 114 and replayMode == 0: #r button 
+        elif num == 114 and replayMode == 0: #r button
             if recordingStatus == 1:
                 recordingStatus = 0
                 saveLogFile(args)
@@ -159,7 +160,7 @@ def showLoadMenu(args):
             cursorPos = lenFts -1
 
         unalteredEntry = filesToShow[cursorPos]
-        filesToShow[cursorPos] = util.setcolor("yellow") + ">" + filesToShow[cursorPos]   + util.setcolor("white")      
+        filesToShow[cursorPos] = util.setcolor("yellow") + ">" + filesToShow[cursorPos]   + util.setcolor("white")
         fileString = util.listToString(filesToShow, True)
         print(fileString)
 
@@ -167,7 +168,7 @@ def showLoadMenu(args):
             selected = 0
             currentScreen = 2
             loadReplay(unalteredEntry.strip(), args)
-            
+
 
     else:
         print("No recordings found in ./logs")
@@ -178,7 +179,7 @@ def loadReplay(filename, args):
 
     dir = "logs/"
     if os.path.isfile(dir + filename):
-        
+
         file = open(dir + filename, "r")
         lines = file.readlines()
         lineCount = len(lines)
@@ -199,14 +200,14 @@ def loadReplay(filename, args):
 
                 clean = ast.literal_eval(lines[correctedLineNumber])
                 interpret.interpretPacket(clean, args)
-                
+
                 if args.isgitbash:
                     time.sleep(0.01) # adjust to speed of normal program. prob wildy diff per pc. aiming for time between frames of 0.05 - 0.06
                 else:
                     time.sleep(0.03)
                 print("Replay progress: "+ str(correctedLineNumber) + "/" + str(lineCount))
 
-    
+
     replayMode = 0
 
 loggedFrames = []
@@ -259,7 +260,7 @@ def updateSuspensionCatalogue(car, surface, minF, maxF, minB, maxB):
                 surface + "MaxB": maxB
             }
             content.append(entry)
-                    
+
         file.close()
         file = open(catalogue, "w", encoding="utf-8")
         #write modified content back
@@ -289,10 +290,91 @@ def updateSuspensionCatalogue(car, surface, minF, maxF, minB, maxB):
 def getSuspensionCatalogue():
     catalogue = "SuspensionCatalogue.json"
     content = []
-    
+
     if os.path.isfile(catalogue):
         file = open(catalogue, "r", encoding="utf-8")
         content = json.loads(file.read())
         file.close()
 
     return content
+
+def updatePBTable(packet):
+    table = "TimesDatabase.csv"
+
+    if "stage_result_time" in packet and os.path.isfile(table):
+
+        #api on a version that supports this (1.8.0 +)
+        location = packet["location_id"]
+        locationName = util.resolveId(location, "locations")
+        route = packet["route_id"]
+        routeName = util.resolveId(route, "routes")
+        gamemode = packet["game_mode"]
+        gamemodeName = util.resolveId(gamemode, "game_mode")
+        time = packet["stage_result_time"]
+        timeReadable = util.pretty_print_time(time)
+        penalty = packet["stage_result_time_penalty"]
+        status = packet["stage_result_status"]
+        vehicle = packet["vehicle_id"]
+        vehicleName = util.resolveId(vehicle, "vehicles")
+        carclass = packet["vehicle_class_id"]
+        carclassName = util.resolveId(carclass, "vehicle_classes")
+
+        if carclass == 19 and (vehicle == 124 or vehicle == 125 or vehicle == 124):
+            vehicleName = vehicleName + " 24" #EA didnt update the names of the vehicles, only the ID
+        elif carclass == 19 and (vehicle == 103 or vehicle == 104 or vehicle == 105):
+            vehicleName = vehicleName + " 23"
+
+        manufacturer = packet["vehicle_manufacturer_id"]
+        manufacturerName = util.resolveId(manufacturer, "vehicle_manufacturers")
+        shakedown = packet["stage_shakedown"]
+
+        packetkey = str(location) + "_" + str(route) + "_" + str(manufacturer) + "_" + str(vehicle) + "_" + str(carclass)
+        packetRow = [location, locationName, route, routeName, manufacturer, manufacturerName, vehicle, vehicleName, carclass, carclassName, time, timeReadable, penalty, gamemodeName, str(datetime.datetime.now())]
+
+        #only add when finished, not when dnf.
+        if util.resolveId(status, "stage_result_status") == "finished" and shakedown == False:
+            print("\n" + util.setcolor("green") + "Updating PB Database" + util.setcolor("white"))
+
+            rows = []
+            with open(table, "r", encoding="utf-16") as file:
+                reader = csv.reader(file)
+                rows = list(reader)
+
+            rowMatched = None
+            overwrite = False
+            counter = 0
+            for row in rows:
+                if row == [] or row == "":
+                    continue
+
+                rowkey = row[0] + "_" + row[2] + "_" + row[4] + "_" + row[6] + "_" + row[8]
+
+                #check if value is already in the db
+                if packetkey == rowkey:
+                    rowMatched = counter
+                    #update existing row if time is faster.
+                    loggedTime = float(row[10])
+                    time
+
+                    if time < loggedTime:
+                        overwrite = True
+                        break
+
+                counter = counter + 1
+
+
+            if rowMatched == None:
+                rows.append(packetRow)
+            elif overwrite == True:
+                rows[counter] = packetRow
+
+
+            #remove empty rows if there are any:
+            cleanrows = [row for row in rows if row != []]
+
+            with open(table, "w", encoding="utf-16", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerows(cleanrows)
+            print("ROWS: " + str(cleanrows))
+            print("\n" + util.setcolor("green") + "Done" + util.setcolor("white"))
+

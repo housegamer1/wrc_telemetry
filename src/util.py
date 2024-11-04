@@ -1,6 +1,8 @@
 import struct
 import json
 import os
+import datetime
+import time
 
 def _resolveFloat(asBytes):
     return round(struct.unpack("f", asBytes)[0], 2)
@@ -152,3 +154,31 @@ def roundToNearest(value, nearest):
 
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
+
+
+
+def pretty_print_time(seconds):
+    #shameless inefficient yoink from my telegram bot, cba looking up a smart solution
+    playerTimeAsDelta =  str(datetime.timedelta(seconds=seconds))
+    if '.' in playerTimeAsDelta:
+        playerTimeAsDelta = playerTimeAsDelta[:-4]
+    else:
+        playerTimeAsDelta = playerTimeAsDelta + ".00"
+
+    playerTimeString = ""
+
+    #fuck this imma format this manually
+    while  playerTimeAsDelta.startswith("0"):
+        if playerTimeAsDelta.startswith("0:"):
+            playerTimeAsDelta = playerTimeAsDelta[2:]
+        else:
+            playerTimeAsDelta = playerTimeAsDelta[1:]
+
+    if seconds >= 3600:
+        playerTimeString = playerTimeAsDelta + " hours"
+    elif seconds >= 60:
+        playerTimeString = playerTimeAsDelta + " minutes"
+    else:
+        playerTimeString = playerTimeAsDelta + " seconds"
+
+    return playerTimeString

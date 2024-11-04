@@ -24,7 +24,7 @@ def interpretPacket(data, args):
         for byte in data:
             bytesAsNumerical.append(byte)
     else:
-        bytesAsNumerical = data    
+        bytesAsNumerical = data
 
     #print("bytes as numerical: "+  str(bytesAsNumerical))
     #print("Number of exported fields: "+  str(len(bytesAsNumerical)))
@@ -75,7 +75,8 @@ def interpretPacket(data, args):
     if inout.recordingStatus == 1:
         inout.logFrame(bytesAsNumerical)
 
-    
+    return packet
+
 def interpretCustom2(bytesAsNumerical):
     packet = {}
 
@@ -114,7 +115,7 @@ def interpretCustom1(bytesAsNumerical, modifiedCustom1):
 
     # shiftlights_rpm_end               4 Bytes float32
     packet["shiftlights_rpm_end"] = util.resolveFloatValueRound(bytesAsNumerical[32:36])
-    
+
     # shiftlights_rpm_valid             1 Byte boolean
     packet["shiftlights_rpm_valid"] = util.resolveBoolean(bytesAsNumerical[36:37])
 
@@ -291,7 +292,7 @@ def interpretCustom1(bytesAsNumerical, modifiedCustom1):
         #Below is from update 1.7.0
         #Loading a replay from an older version would crash here, so we need to do a size check
         if len(bytesAsNumerical) > 247:
-        
+
             #stage_shakedown                1 Byte boolean
             packet["stage_shakedown"] = util.resolveBoolean(bytesAsNumerical[247:248])
 
@@ -314,7 +315,7 @@ def interpretCustom1(bytesAsNumerical, modifiedCustom1):
 
             #vehicle_tyre_state_br          1 Byte uint8: id
             packet["vehicle_tyre_state_br"] = util.resolveIntValue(bytesAsNumerical[255:256])
-            
+
             #vehicle_tyre_state_fl          1 Byte uint8: id
             packet["vehicle_tyre_state_fl"] = util.resolveIntValue(bytesAsNumerical[256:257])
             #packet["vehicle_tyre_state_fl"] = "1.8.0 Buggy" #for now, just so we get the visuals in the dashboard
@@ -323,9 +324,9 @@ def interpretCustom1(bytesAsNumerical, modifiedCustom1):
             packet["vehicle_tyre_state_fr"] = util.resolveIntValue(bytesAsNumerical[257:258])
             #packet["vehicle_tyre_state_fr"] = "1.8.0 Buggy" #for now, just so we get the visuals in the dashboard
 
-            #stage_progress                 4 Bytes float32: in % 0-1        
+            #stage_progress                 4 Bytes float32: in % 0-1
             packet["stage_progress"] = util.resolveFloatValue(bytesAsNumerical[258:262])
-            
+
             #stage_result_time              4 Bytes float32: in s
             packet["stage_result_time"] = util.resolveFloatValue(bytesAsNumerical[262:266])
 
@@ -335,6 +336,6 @@ def interpretCustom1(bytesAsNumerical, modifiedCustom1):
             #stage_result_status            1 Byte uint8: id
             packet["stage_result_status"] = util.resolveIntValue(bytesAsNumerical[270:271])
 
-           
+
 
     return packet

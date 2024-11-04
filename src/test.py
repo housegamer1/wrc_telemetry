@@ -2,6 +2,7 @@ import dashboard
 import inout 
 import suspension
 import util
+import interpret
 
 # not real testing okay, cba to do that.
 # just a helper to analyse certain issues
@@ -145,6 +146,12 @@ def testTireStatus():
     print(dashboard._visTireState(packet))
     print("=== Hub pos test end ===")
 
+def testTimeDB():
+    rawpacket = [172, 68, 0, 0, 0, 0, 0, 0, 9, 149, 20, 68, 137, 136, 136, 60, 251, 201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 216, 241, 69, 29, 188, 0, 70, 1, 3, 0, 10, 5, 125, 105, 176, 65, 227, 250, 127, 63, 55, 228, 188, 68, 58, 20, 216, 194, 70, 224, 43, 197, 40, 41, 174, 65, 165, 120, 133, 191, 127, 156, 86, 64, 207, 34, 95, 193, 104, 46, 52, 64, 152, 198, 145, 191, 17, 82, 46, 191, 90, 92, 7, 62, 69, 102, 56, 191, 121, 206, 57, 63, 76, 208, 23, 188, 6, 22, 48, 191, 148, 225, 199, 61, 14, 190, 125, 63, 205, 145, 183, 61, 165, 121, 10, 190, 27, 157, 184, 189, 38, 62, 119, 189, 161, 71, 165, 188, 5, 99, 102, 190, 186, 63, 164, 61, 131, 54, 136, 62, 32, 29, 228, 189, 0, 0, 0, 0, 37, 79, 2, 64, 0, 0, 0, 0, 67, 233, 1, 64, 50, 47, 117, 67, 33, 2, 146, 67, 158, 160, 127, 67, 9, 82, 140, 67, 31, 208, 4, 70, 32, 160, 12, 69, 55, 228, 5, 69, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 192, 23, 67, 88, 225, 86, 138, 95, 138, 177, 64, 0, 0, 0, 32, 146, 27, 177, 64, 104, 0, 19, 0, 6, 0, 27, 0, 105, 1, 0, 0, 182, 243, 233, 65, 0, 0, 0, 0, 0, 57, 58, 131, 63, 133, 235, 20, 67, 0, 0, 32, 65, 1]
+    packet = interpret.interpretCustom1(rawpacket, True)
+
+    inout.updatePBTable(packet)
+
 if __name__ == "__main__":
     #testSteering()
     #testAccel()
@@ -152,4 +159,5 @@ if __name__ == "__main__":
     #testHubPos()
     #testResolveId()
     #testCatalogue() #dont call unless you made a backup of suspensionCatalogue.json, will introduce fake values 
-    testTireStatus()
+    #testTireStatus()
+    testTimeDB()
