@@ -333,7 +333,6 @@ def updatePBTable(packet):
 
         #only add when finished, not when dnf.
         if util.resolveId(status, "stage_result_status") == "finished" and shakedown == False:
-            print("\n" + util.setcolor("green") + "Updating PB Database" + util.setcolor("white"))
 
             rows = []
             with open(table, "r", encoding="utf-16") as file:
@@ -368,12 +367,13 @@ def updatePBTable(packet):
             elif overwrite == True:
                 rows[counter] = packetRow
 
+            if rowMatched == None or overwrite == True:
+                print("\n" + util.setcolor("green") + "Updating PB Database" + util.setcolor("white"))
+                #remove empty rows if there are any:
+                cleanrows = [row for row in rows if row != []]
 
-            #remove empty rows if there are any:
-            cleanrows = [row for row in rows if row != []]
-
-            with open(table, "w", encoding="utf-16", newline="") as file:
-                writer = csv.writer(file)
-                writer.writerows(cleanrows)
+                with open(table, "w", encoding="utf-16", newline="") as file:
+                    writer = csv.writer(file)
+                    writer.writerows(cleanrows)
 
 
