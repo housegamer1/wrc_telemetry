@@ -364,8 +364,15 @@ def visualizePacket(packet, fancy):
     if "game_mode" in packet:
         gamemode = util.cleanGamemode(util.resolveId(packet["game_mode"], "game_mode"))
 
+    pb = inout.getPB(packet)
+
     if car != "" or location != "" or stage != "" or gamemode != "":
-        printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode + "\n\n"
+        printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode
+        
+    if pb != "":
+        printstring = printstring + " | PB: " + pb
+        
+    printstring = printstring + "\n\n"
 
     if "vehicle_throttle" in packet:
         printstring = printstring + ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\t"

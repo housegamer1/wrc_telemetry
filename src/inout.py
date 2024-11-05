@@ -370,3 +370,42 @@ def updatePBTable(packet):
                     writer.writerows(cleanrows)
 
 
+lastReadRows = []
+lastReadTime = 0
+def getPB(packet):
+    global lastReadRows
+    global lastReadTime
+    pbCheckCacheTime = 10 #seconds
+
+    currentTime = time.time()
+
+    pbtime = ""
+    table = "TimesDatabase.csv"
+
+    if "stage_result_time" in packet and os.path.isfile(table):
+
+        #api on a version that supports this (1.8.0 +)
+        location = packet["location_id"]
+        route = packet["route_id"]
+        vehicle = packet["vehicle_id"]
+        carclass = packet["vehicle_class_id"]
+        manufacturer = packet["vehicle_manufacturer_id"]
+        packetkey = str(location) + "_" + str(route) + "_" + str(manufacturer) + "_" + str(vehicle) + "_" + str(carclass)
+
+
+        if (currentTime - lastReadTime) > pbCheckCacheTime:
+            with open(table, "r", encoding="utf-16") as file:
+                reader = csv.reader(file)
+                lastReadRows = list(reader)
+                lastReadTime = currentTime
+        
+        for row in lastReadRows:
+            if row == [] or row == "":
+                continue
+
+            rowkey = row[0] + "_" + row[2] + "_" + row[4] + "_" + row[6] + "_" + row[8]
+            if packetkey == rowkey:
+                loggedTime = float(row[10])
+                pbtime = util.pretty_print_time(loggedTime)
+                break
+    return pbtime
