@@ -325,7 +325,7 @@ def updatePBTable(packet):
         packetRow = [location, locationName, route, routeName, manufacturer, manufacturerName, vehicle, vehicleName, carclass, carclassName, time, timeReadable, penalty, gamemodeName, str(datetime.datetime.now())]
 
         #only add when finished, not when dnf.
-        if util.resolveId(status, "stage_result_status") == "finished" and shakedown == False:
+        if util.resolveId(status, "stage_result_status") == "finished" and shakedown == False and gamemodeName != "test_drive" and gamemodeName != "rally_school":
 
             rows = []
             with open(table, "r", encoding="utf-16") as file:
