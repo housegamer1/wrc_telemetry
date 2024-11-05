@@ -144,6 +144,12 @@ def resolveId(id, section):
                 returnString = entry["name"]
                 break
 
+    if section == "vehicles":
+        if id == 124 or id == 125 or id == 124:
+            returnString = returnString + " 24" #EA didnt update the names of the vehicles, only the ID
+        elif id == 103 or id == 104 or id == 105:
+            returnString = returnString + " 23"   
+
     return returnString
 
 def cleanGamemode(gamemode):

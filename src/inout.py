@@ -318,16 +318,9 @@ def updatePBTable(packet):
         vehicleName = util.resolveId(vehicle, "vehicles")
         carclass = packet["vehicle_class_id"]
         carclassName = util.resolveId(carclass, "vehicle_classes")
-
-        if carclass == 19 and (vehicle == 124 or vehicle == 125 or vehicle == 124):
-            vehicleName = vehicleName + " 24" #EA didnt update the names of the vehicles, only the ID
-        elif carclass == 19 and (vehicle == 103 or vehicle == 104 or vehicle == 105):
-            vehicleName = vehicleName + " 23"
-
         manufacturer = packet["vehicle_manufacturer_id"]
         manufacturerName = util.resolveId(manufacturer, "vehicle_manufacturers")
         shakedown = packet["stage_shakedown"]
-
         packetkey = str(location) + "_" + str(route) + "_" + str(manufacturer) + "_" + str(vehicle) + "_" + str(carclass)
         packetRow = [location, locationName, route, routeName, manufacturer, manufacturerName, vehicle, vehicleName, carclass, carclassName, time, timeReadable, penalty, gamemodeName, str(datetime.datetime.now())]
 
