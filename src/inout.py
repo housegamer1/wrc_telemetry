@@ -65,6 +65,7 @@ def clearScreen(args):
         #os.system("cls")
         print("\x1b[2J")
         print("\x1b[H")
+        print('\033[?25l', end="")  #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
 
     showMenu(args)
 
