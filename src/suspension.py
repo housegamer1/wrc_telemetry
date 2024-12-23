@@ -205,7 +205,7 @@ def oncePerKmAction():
 
 currentCar = ""
 surfaceType = ""
-def visualizePacket(packet, hide):
+def visualizePacket(packet, hide, menustr=False):
     requiredData = []
     requiredData.append("vehicle_hub_position_fl")
     requiredData.append("vehicle_hub_position_fr")
@@ -271,4 +271,8 @@ def visualizePacket(packet, hide):
         backString = util.drawSideBySide(posBlString, posBrString)
 
         finalString = finalString + util.drawSideBySide(frontString, backString)    
+
+        if menustr != None:
+            finalString = menustr + "\n" + finalString
+
         print(finalString)

@@ -117,7 +117,7 @@ def visualizeGforce(maxrpm, rpmAccuracy, currentGear, currentRpm):
 
 
 
-def printPacket(packet):
+def printPacket(packet, menustr=False):
     measureTimeString = measureZeroToOnehundred(packet)
     gforceString = measureGforce(packet)
 
@@ -133,6 +133,9 @@ def printPacket(packet):
     else:
         printString = ">>>   Press (T) to toggle powerband\n"
         printString = printString + measureTimeString
+
+    if menustr != None:
+        printString = menustr + "\n" + printString
 
     print(printString)
 

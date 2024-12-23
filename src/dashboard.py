@@ -340,7 +340,7 @@ def _visAccel(fw, sw, resetMaxG):
     return returnstring
 
 
-def visualizePacket(packet, fancy):
+def visualizePacket(packet, fancy, menustr=None):
     
     printstring = ""
 
@@ -442,5 +442,9 @@ def visualizePacket(packet, fancy):
         
     if histoString != "" or accelstring != "":
         printstring = printstring + util.drawSideBySide(histoString, accelstring)
+
+    if menustr != None:
+        printstring = menustr + "\n" + printstring
+
 
     print(printstring)

@@ -9,6 +9,10 @@ def packetToString(packet):
             count = 0
     return printstring
 
-def printPacket(packet):
+def printPacket(packet, menustr=None):
     stringpacket = packetToString(packet)
+
+    if menustr != None:
+        stringpacket = menustr + "\n" + stringpacket
+
     print(stringpacket)

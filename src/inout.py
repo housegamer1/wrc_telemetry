@@ -143,6 +143,7 @@ def readInput(args):
 
 cursorPos = 0
 def showLoadMenu(args):
+    readInput(args)
     global cursorPos
     global selected
     global currentScreen
@@ -200,7 +201,7 @@ def loadReplay(filename, args):
                     break
 
                 clean = ast.literal_eval(lines[correctedLineNumber])
-                interpret.interpretPacket(clean, args)
+                interpret.interpretPacket(clean, args, menu=True) #need the menu shown to jump to different screens in replay + to read input keys
 
                 if args.isgitbash:
                     time.sleep(0.01) # adjust to speed of normal program. prob wildy diff per pc. aiming for time between frames of 0.05 - 0.06

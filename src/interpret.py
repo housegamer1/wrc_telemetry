@@ -7,7 +7,7 @@ import time
 import science
 
 timeOfLastFrame = 0
-def interpretPacket(data, args):
+def interpretPacket(data, args, menu=False):
     #print("data is: " + str(data))
 
     global timeOfLastFrame
@@ -45,19 +45,23 @@ def interpretPacket(data, args):
         inout.clearScreen(args)
         t4 = time.time()
 
+        menustr = None
+        if menu:
+            menustr = inout.showMenu(args, get=True)
+
         if inout.currentScreen == 1:
-            dashboard.visualizePacket(packet, False)
+            dashboard.visualizePacket(packet, False, menustr)
         elif inout.currentScreen == 2:
-            dashboard.visualizePacket(packet, True)
+            dashboard.visualizePacket(packet, True, menustr)
         elif inout.currentScreen == 3:
-            suspension.visualizePacket(packet, False)
+            suspension.visualizePacket(packet, False, menustr)
         elif inout.currentScreen == 4:
-            raw.printPacket(packet)
+            raw.printPacket(packet, menustr)
         elif inout.currentScreen == 5:
-            science.printPacket(packet)
+            science.printPacket(packet, menustr)
 
         if inout.currentScreen != 3:
-            suspension.visualizePacket(packet, True) #run the suspension code but hide the visuals, so we can record min and max values for our catalogue
+            suspension.visualizePacket(packet, True) #run the suspension code in the background but hide the visuals, so we can record min and max values for our catalogue
     else:
         print("unable to interpret packet")
 
