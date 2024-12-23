@@ -15,7 +15,7 @@ selected = 0
 skipAhead = 0
 toggleAccelerometer = 0
 togglePowerband = 0
-def showMenu(args):
+def showMenu(args, get=False):
     readInput(args)
 
     menuString = ""
@@ -53,7 +53,8 @@ def showMenu(args):
     else:
         menuString = menuString + "(L) Load\n"
 
-
+    if get:
+        return(menuString)
     print(menuString, flush=True)
 
 def clearScreen(args):
@@ -63,11 +64,10 @@ def clearScreen(args):
         print('\033[?25l', end="")  #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
     else:
         #os.system("cls")
-        print("\x1b[2J")
-        print("\x1b[H")
-        print('\033[?25l', end="")  #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
-
-    showMenu(args)
+        #print("\x1b[2J")
+        #print("\x1b[H")
+        #print('\033[?25l', end="")  #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
+        print("\x1b[2J\x1b[H\033[?25l", end="")
 
 def readInput(args):
     if msvcrt.kbhit():

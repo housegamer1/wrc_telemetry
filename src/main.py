@@ -58,7 +58,7 @@ def connectToServer(args):
                         inout.updatePBTable(latestPacket)
                         lastPackageUsedToUpdate = latestPacket.copy()
 
-                    print(">>>    No packets received, sleeping")
+                    print(inout.showMenu(args, get=True) + "\n>>>    No packets received, sleeping")
                     #print("\nLatest Packet:\n" + str(latestPacket))
                     time.sleep(0.25)
 

@@ -1,4 +1,4 @@
-def printPacket(packet):
+def packetToString(packet):
     printstring = ">>>   "
     count = 0
     for field in packet:  
@@ -7,5 +7,8 @@ def printPacket(packet):
         if count == 3:
             printstring = printstring + "\n>>>   "
             count = 0
-    
-    print(printstring)
+    return printstring
+
+def printPacket(packet):
+    stringpacket = packetToString(packet)
+    print(stringpacket)
