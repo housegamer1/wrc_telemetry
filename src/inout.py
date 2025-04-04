@@ -381,7 +381,10 @@ def getPB(packet):
 
     currentTime = time.time()
 
-    pbtime = ""
+    pbCar = ""
+    pbClass = ""
+    pbOverall = ""
+
     table = "TimesDatabase.csv"
 
     if "stage_result_time" in packet and os.path.isfile(table):
@@ -393,7 +396,8 @@ def getPB(packet):
         carclass = packet["vehicle_class_id"]
         manufacturer = packet["vehicle_manufacturer_id"]
         packetkey = str(location) + "_" + str(route) + "_" + str(manufacturer) + "_" + str(vehicle) + "_" + str(carclass)
-
+        packetkeyClass = str(location) + "_" + str(route) + "_" + str(carclass)
+        packetkeyOverall = str(location) + "_" + str(route)
 
         if (currentTime - lastReadTime) > pbCheckCacheTime:
             with open(table, "r", encoding="utf-16") as file:
@@ -406,8 +410,30 @@ def getPB(packet):
                 continue
 
             rowkey = row[0] + "_" + row[2] + "_" + row[4] + "_" + row[6] + "_" + row[8]
-            if packetkey == rowkey:
+            rowkeyClass = row[0] + "_" + row[2] + "_" + row[8]
+            rowkeyOverall =  row[0] + "_" + row[2]
+
+            if packetkey == rowkey: #this one is unique so no need for checking if the time is lower
                 loggedTime = float(row[10])
-                pbtime = util.pretty_print_time(loggedTime)
-                break
-    return pbtime
+                pbCar = util.pretty_print_time(loggedTime)
+
+            if packetkeyClass == rowkeyClass:
+                rowTime = float(row[10])
+                if pbClass == "":
+                    pbClass = rowTime
+                elif rowTime < pbClass:
+                    pbClass = rowTime
+
+            if packetkeyOverall == rowkeyOverall:
+                rowTime = float(row[10])
+                if pbOverall == "":
+                    pbOverall = rowTime
+                elif rowTime < pbOverall:
+                    pbOverall = rowTime
+
+        if pbClass != "":
+            pbClass = util.pretty_print_time(pbClass)
+
+        if pbOverall != "":
+            pbOverall = util.pretty_print_time(pbOverall)
+    return pbCar, pbClass, pbOverall

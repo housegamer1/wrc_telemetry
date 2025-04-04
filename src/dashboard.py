@@ -364,13 +364,13 @@ def visualizePacket(packet, fancy, menustr=None):
     if "game_mode" in packet:
         gamemode = util.cleanGamemode(util.resolveId(packet["game_mode"], "game_mode"))
 
-    pb = inout.getPB(packet)
+    pbCar, pbClass, pbOverall = inout.getPB(packet)
 
     if car != "" or location != "" or stage != "" or gamemode != "":
-        printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode
+        printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode + "\n"
         
-    if pb != "":
-        printstring = printstring + " | PB: " + pb
+    if pbCar != "":
+        printstring = printstring + "PB (Car): " + pbCar + " | PB (Class): " + pbClass + " | PB (Overall): " + pbOverall + "\n"
         
     printstring = printstring + "\n\n"
 
@@ -384,13 +384,13 @@ def visualizePacket(packet, fancy, menustr=None):
         printstring = printstring + ">>>   Clutch:\t\t" + _visPedal(packet["vehicle_clutch"], "white") + "\t"
 
     if "vehicle_handbrake" in packet:
-        printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], "red") + "\n\n"
+        printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], "red") + "\n"
 
     if "stage_current_distance" in packet and "stage_length" in packet:
         printstring = printstring + ">>>   Distance:\t\t" + str(util.mToKm(packet["stage_current_distance"])) + "/" + str(util.mToKm(packet["stage_length"])) + " km\t"
 
     if "vehicle_steering" in packet:    
-        printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\n\n"
+        printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\n"
 
     if "vehicle_gear_maximum" in packet and "vehicle_gear_index" in packet and "vehicle_gear_index_reverse" in packet and "vehicle_gear_index_neutral" in packet:
         printstring = printstring + ">>>   Gear:\t\t" + _visGear(packet) + "\t\t"
@@ -424,7 +424,7 @@ def visualizePacket(packet, fancy, menustr=None):
     if "vehicle_brake_temperature_bl" in packet and "vehicle_brake_temperature_br" in packet and "vehicle_brake_temperature_fl" in packet and "vehicle_brake_temperature_fr" in packet:
         brakeString = ">>>   Brake Temp:\t" + _visBrakeTemp(packet)
 
-    printstring = printstring + util.drawSideBySide(brakeString, tireString) + "\n\n"
+    printstring = printstring + util.drawSideBySide(brakeString, tireString) + "\n"
 
     printstring = printstring + ">>>   Press (T) to toggle accelerometer\n"
     histoString = ""
