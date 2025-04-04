@@ -370,7 +370,7 @@ def visualizePacket(packet, fancy, menustr=None):
         printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode + "\n"
         
 
-    printstring = printstring + "PB (Car): " + pbCar + " | PB (Class): " + pbClass + " | PB (Overall): " + pbOverall + "\n"
+    printstring = printstring + "PB (Car): " + pbCar + " | Class: " + pbClass + " | Overall: " + pbOverall + "\n"
         
     printstring = printstring + "\n\n"
 
