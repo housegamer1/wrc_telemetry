@@ -369,8 +369,8 @@ def visualizePacket(packet, fancy, menustr=None):
     if car != "" or location != "" or stage != "" or gamemode != "":
         printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode + "\n"
         
-    if pbCar != "":
-        printstring = printstring + "PB (Car): " + pbCar + " | PB (Class): " + pbClass + " | PB (Overall): " + pbOverall + "\n"
+
+    printstring = printstring + "PB (Car): " + pbCar + " | PB (Class): " + pbClass + " | PB (Overall): " + pbOverall + "\n"
         
     printstring = printstring + "\n\n"
 
