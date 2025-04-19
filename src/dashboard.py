@@ -434,7 +434,7 @@ def visualizePacket(packet, fancy, menustr=None):
     else:
         printstring = printstring + "PB Car: " + pbCar + " | Class: " + pbClass + " | Overall: " + pbOverall + "\n"
         
-    printstring = printstring + "\n\n"
+    printstring = printstring + "\n"
 
     if "vehicle_throttle" in packet:
         printstring = printstring + ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\t"
