@@ -364,13 +364,75 @@ def visualizePacket(packet, fancy, menustr=None):
     if "game_mode" in packet:
         gamemode = util.cleanGamemode(util.resolveId(packet["game_mode"], "game_mode"))
 
-    pbCar, pbClass, pbOverall = inout.getPB(packet)
+    pb = inout.getPB(packet)
+    pbCar = pb["pbCar"]
+    pbClass = pb["pbClass"]
+    pbOverall = pb["pbOverall"]
+
+    pbsplitsCar = util.parse_stringarray_of_floats(pb["splitsCar"])
+    pbsplitsClass = util.parse_stringarray_of_floats(pb["splitsClass"])
+    pbsplitsOverall = util.parse_stringarray_of_floats(pb["splitsOverall"])
+
+    splitsCurrent = packet["splits"]
+    splitsUpdatedAt = packet["splits_updated_at"]
 
     if car != "" or location != "" or stage != "" or gamemode != "":
         printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode + "\n"
         
+    secondsPastSplit = packet["stage_current_time"] - splitsUpdatedAt
+    if splitsCurrent != [] and secondsPastSplit < 5:
 
-    printstring = printstring + "PB Car: " + pbCar + " | Class: " + pbClass + " | Overall: " + pbOverall + "\n"
+        splitsumCurrent = 0
+        splitsumPbCar = 0
+        splitsumPbClass = 0
+        splitsumPbOverall = 0
+
+        splitcount = 0
+        for currentSplitsEntry in splitsCurrent:
+            #loop limited to the amount of splits the player has already driven in the current run.
+            
+            splitsumCurrent = splitsumCurrent + currentSplitsEntry
+
+            if len(pbsplitsCar) >= (splitcount +1):
+                splitsumPbCar = splitsumPbCar + pbsplitsCar[splitcount]
+
+            if len(pbsplitsClass) >= (splitcount +1):
+                splitsumPbClass = splitsumPbClass + pbsplitsClass[splitcount]
+
+            if len(pbsplitsOverall) >= (splitcount +1):
+                splitsumPbOverall = splitsumPbOverall + pbsplitsOverall[splitcount]
+    
+            splitcount = splitcount + 1
+
+        diffCar = round(splitsumCurrent - splitsumPbCar, 3)
+        diffClass = round(splitsumCurrent - splitsumPbClass, 3)
+        diffOverall = round(splitsumCurrent - splitsumPbOverall, 3)
+
+        colorCar = util.setcolor("red") + "+" if diffCar > 0 else util.setcolor("green")
+        colorClass = util.setcolor("red") + "+" if diffClass > 0 else util.setcolor("green")
+        colorOverall = util.setcolor("red") + "+" if diffOverall > 0 else util.setcolor("green")
+
+        printCar = ""
+        if splitsumPbCar == 0:
+            printCar = util.setcolor("yellow") + " -- " + util.setcolor("white")
+        else:
+            printCar = colorCar + str(diffCar) + util.setcolor("white")
+
+        printClass = ""
+        if splitsumPbClass == 0:
+            printClass = util.setcolor("yellow") + " -- " + util.setcolor("white")
+        else:
+            printClass = colorClass + str(diffClass) + util.setcolor("white")
+
+        printOverall = ""
+        if splitsumPbOverall == 0:
+            printOverall = util.setcolor("yellow") + " -- " + util.setcolor("white")
+        else:
+            printOverall = colorOverall + str(diffOverall) + util.setcolor("white")
+        
+        printstring = printstring + "PB Car: " + printCar + " | Class: " + printClass + " | Overall: " + printOverall + "\n"
+    else:
+        printstring = printstring + "PB Car: " + pbCar + " | Class: " + pbClass + " | Overall: " + pbOverall + "\n"
         
     printstring = printstring + "\n\n"
 

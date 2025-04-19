@@ -4,8 +4,8 @@ import os
 import datetime
 import time
 
-def _resolveFloat(asBytes):
-    return round(struct.unpack("f", asBytes)[0], 2)
+def _resolveFloat(asBytes, precision=2):
+    return round(struct.unpack("f", asBytes)[0], precision)
 
 def _resolveDouble(asBytes):
     return round(struct.unpack("d", asBytes)[0], 2)
@@ -33,9 +33,9 @@ def resolveIntValue(byteValues):
     asInt = _resolveInt(asBytes)
     return asInt
 
-def resolveFloatValue(byteValues):
+def resolveFloatValue(byteValues, round=2):
     asBytes = bytes(byteValues)
-    asRpm = _resolveFloat(asBytes)
+    asRpm = _resolveFloat(asBytes, round)
     return asRpm
     
 def resolveFloatValueRound(byteValues):
@@ -188,3 +188,16 @@ def pretty_print_time(seconds):
         playerTimeString = playerTimeAsDelta + " seconds"
 
     return playerTimeString
+
+
+def parse_stringarray_of_floats(floatarray_in_stringform):
+    floatarray_in_stringform = str(floatarray_in_stringform).replace("[", "").replace("]", "").replace(" ", "")
+    stringarray = floatarray_in_stringform.split(",")
+
+    floatarray = []
+
+    for entry in stringarray:
+        if entry != "":
+            floatarray.append(float(entry))
+
+    return floatarray

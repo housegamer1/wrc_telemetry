@@ -45,6 +45,9 @@ def interpretPacket(data, args, menu=False):
         inout.clearScreen(args)
         t4 = time.time()
 
+        
+        track_splits(packet)
+
         menustr = None
         if menu:
             menustr = inout.showMenu(args, get=True)
@@ -79,6 +82,35 @@ def interpretPacket(data, args, menu=False):
     if inout.recordingStatus == 1:
         inout.logFrame(bytesAsNumerical)
 
+    return packet
+
+split_times = []
+game_time_of_last_split = 0
+def track_splits(packet):
+    global split_times
+    global game_time_of_last_split
+
+    if "stage_current_distance" in packet and "stage_previous_split_time" in packet:
+    
+        if packet["stage_current_distance"] == 0:
+            split_times = [] #reset recorded splits if stage distance is 0
+            game_time_of_last_split = 0
+
+        previous_split = packet["stage_previous_split_time"] 
+
+        if previous_split != 0.0:
+            if split_times == []:
+                split_times.append(previous_split)
+                game_time_of_last_split = packet["stage_current_time"]
+
+            elif previous_split != split_times[len(split_times) -1]:
+                #different value than the previous entry.
+                #pray that two following splits are never the same length, as it would be impossible to detect that there was a new split time then.
+                split_times.append(previous_split)
+                game_time_of_last_split = packet["stage_current_time"]
+
+    packet["splits"] = split_times
+    packet["splits_updated_at"] = game_time_of_last_split
     return packet
 
 def interpretCustom2(bytesAsNumerical):
@@ -309,7 +341,7 @@ def interpretCustom1(bytesAsNumerical, modifiedCustom1):
             packet["game_mode"] = util.resolveIntValue(bytesAsNumerical[248:249])
 
             #stage_previous_split_time      4 Bytes float32: in s
-            packet["stage_previous_split_time"] = util.resolveFloatValue(bytesAsNumerical[249:253])
+            packet["stage_previous_split_time"] = util.resolveFloatValue(bytesAsNumerical[249:253],3) #round to 3 digits to better compare to the games splits
 
              #vehicle_cluster_abs            1 Byte boolean
             packet["vehicle_cluster_abs"] = util.resolveBoolean(bytesAsNumerical[253:254])

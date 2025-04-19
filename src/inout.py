@@ -302,7 +302,6 @@ def getSuspensionCatalogue():
 
 def updatePBTable(packet):
     table = "TimesDatabase.csv"
-
     if "stage_result_time" in packet and os.path.isfile(table):
 
         #api on a version that supports this (1.8.0 +)
@@ -324,7 +323,8 @@ def updatePBTable(packet):
         manufacturerName = util.resolveId(manufacturer, "vehicle_manufacturers")
         shakedown = packet["stage_shakedown"]
         packetkey = str(location) + "_" + str(route) + "_" + str(manufacturer) + "_" + str(vehicle) + "_" + str(carclass)
-        packetRow = [location, locationName, route, routeName, manufacturer, manufacturerName, vehicle, vehicleName, carclass, carclassName, time, timeReadable, penalty, gamemodeName, str(datetime.datetime.now())]
+        splits = "" if packet["splits"] == [] else packet["splits"]
+        packetRow = [location, locationName, route, routeName, manufacturer, manufacturerName, vehicle, vehicleName, carclass, carclassName, time, timeReadable, penalty, gamemodeName, str(datetime.datetime.now()), splits]
 
         #only add when finished, not when dnf.
         if util.resolveId(status, "stage_result_status") == "finished" and shakedown == False and gamemodeName != "test_drive" and gamemodeName != "rally_school":
@@ -372,6 +372,12 @@ def updatePBTable(packet):
                     writer.writerows(cleanrows)
 
 
+def getSplits(row):
+    if len(row) > 15:
+        return row[15]
+    else:
+        return []
+
 lastReadRows = []
 lastReadTime = 0
 def getPB(packet):
@@ -384,6 +390,11 @@ def getPB(packet):
     pbCar = ""
     pbClass = ""
     pbOverall = ""
+
+    splitsCar = []
+    splitsClass = []
+    splitsOverall = []
+
 
     table = "TimesDatabase.csv"
 
@@ -416,24 +427,29 @@ def getPB(packet):
             if packetkey == rowkey: #this one is unique so no need for checking if the time is lower
                 loggedTime = float(row[10])
                 pbCar = util.pretty_print_time(loggedTime)
+                splitsCar = getSplits(row)
 
             if packetkeyClass == rowkeyClass:
                 rowTime = float(row[10])
                 if pbClass == "":
                     pbClass = rowTime
+                    splitsClass = getSplits(row)
                 elif rowTime < pbClass:
                     pbClass = rowTime
+                    splitsClass = getSplits(row)
 
             if packetkeyOverall == rowkeyOverall:
                 rowTime = float(row[10])
                 if pbOverall == "":
                     pbOverall = rowTime
+                    splitsOverall = getSplits(row)
                 elif rowTime < pbOverall:
                     pbOverall = rowTime
+                    splitsOverall = getSplits(row)
 
         if pbClass != "":
             pbClass = util.pretty_print_time(pbClass)
 
         if pbOverall != "":
             pbOverall = util.pretty_print_time(pbOverall)
-    return pbCar, pbClass, pbOverall
+    return {"pbCar":pbCar, "pbClass":pbClass, "pbOverall":pbOverall, "splitsCar":splitsCar, "splitsClass":splitsClass, "splitsOverall":splitsOverall}
