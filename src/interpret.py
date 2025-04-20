@@ -92,10 +92,6 @@ def track_splits(packet):
 
     if "stage_current_distance" in packet and "stage_previous_split_time" in packet:
     
-        if packet["stage_current_distance"] == 0:
-            split_times = [] #reset recorded splits if stage distance is 0
-            game_time_of_last_split = 0
-
         previous_split = packet["stage_previous_split_time"] 
 
         if previous_split != 0.0:
@@ -108,6 +104,10 @@ def track_splits(packet):
                 #pray that two following splits are never the same length, as it would be impossible to detect that there was a new split time then.
                 split_times.append(previous_split)
                 game_time_of_last_split = packet["stage_current_time"]
+
+        if packet["stage_current_distance"] == 0: #reset after, so that sitting on start doesnt list an old split.
+            split_times = [] #reset recorded splits if stage distance is 0
+            game_time_of_last_split = 0
 
     packet["splits"] = split_times
     packet["splits_updated_at"] = game_time_of_last_split
