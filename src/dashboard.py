@@ -379,8 +379,9 @@ def visualizePacket(packet, fancy, menustr=None):
     if car != "" or location != "" or stage != "" or gamemode != "":
         printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode + "\n"
         
-    secondsPastSplit = packet["stage_current_time"] - splitsUpdatedAt
-    if splitsCurrent != [] and secondsPastSplit < 5:
+    stagetime = packet["stage_current_time"]
+    secondsPastSplit = stagetime - splitsUpdatedAt
+    if splitsCurrent != [] and secondsPastSplit < 5 and stagetime > 5: #game keeps previous split field filled from old runs, dont show that after we just set off from the startline
 
         splitsumCurrent = 0
         splitsumPbCar = 0
