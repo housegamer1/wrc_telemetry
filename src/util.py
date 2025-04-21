@@ -119,7 +119,7 @@ def drawSideBySide(leftDraw, rightDraw):
     return returnstring
 
 loadedIds = None
-def resolveId(id, section):
+def resolveId(id, section, shorten=False):
     #print("Resolve id: " + str(id) + ", in section: " + str(section))
     global loadedIds    
     returnString = "N/A"
@@ -150,7 +150,34 @@ def resolveId(id, section):
         elif id == 103 or id == 104 or id == 105:
             returnString = returnString + " 23"   
 
+    if section == "vehicle_classes" and shorten:
+        returnString = shortenClass(returnString)
     return returnString
+
+def shortenClass(carclass):
+    #i dont know what the game exports in other languages here, since my game is in german, some names are annoyingly long.
+    #a few of these will work independent of language though.
+    #might as well use this to translate german classes into english for the viewers. english names are often shorter too.
+    #
+    #this function is only intended for displaypurposes, the timesdatabase will contain unaltered class names.
+
+    if carclass ==  "Gruppe B (Heckantrieb)":
+        return "Group B (RWD)"
+    elif carclass == "Gruppe B (Allrad)":
+        return "Group B (AWD)"
+    elif carclass == "F2 Bausatzwagen":
+        return "F2 Kit Car"
+    elif carclass == "Gruppe A":
+        return "Group A"
+    elif carclass == "World Rally Car 1997-2011":
+        return "WRC 97-11"
+    elif carclass == "World Rally Car 2017–2021":
+        return "WRC 17-21"
+    elif carclass == "World Rally Car 2012 - 2016": #funny they put spaces for this one
+        return "WRC-12-16"
+
+    else:
+        return carclass
 
 def cleanGamemode(gamemode):
     return gamemode.replace("_", " ").title() #capitalizes every words first letter

@@ -365,7 +365,7 @@ def visualizePacket(packet, fancy, menustr=None):
         gamemode = util.cleanGamemode(util.resolveId(packet["game_mode"], "game_mode"))
 
     if "vehicle_class_id" in packet:
-        carclass = util.resolveId(packet["vehicle_class_id"], "vehicle_classes")
+        carclass = util.resolveId(packet["vehicle_class_id"], "vehicle_classes", shorten=True)
 
     pb = inout.getPB(packet)
     pbCar = pb["pbCar"]
@@ -375,7 +375,7 @@ def visualizePacket(packet, fancy, menustr=None):
     pbsplitsCar = util.parse_stringarray_of_floats(pb["splitsCar"])
     pbsplitsClass = util.parse_stringarray_of_floats(pb["splitsClass"])
     pbsplitsOverall = util.parse_stringarray_of_floats(pb["splitsOverall"])
-    overallClass = pb["overallClass"]
+    overallClass = util.shortenClass(pb["overallClass"])
 
     splitsCurrent = packet["splits"]
     splitsUpdatedAt = packet["splits_updated_at"]
