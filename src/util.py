@@ -164,7 +164,7 @@ def shortenClass(carclass):
     if carclass ==  "Gruppe B (Heckantrieb)":
         return "Group B RWD"
     elif carclass == "Gruppe B (Allrad)":
-        return "Group B AWD"
+        return "Group B 4WD"
     elif carclass == "F2 Bausatzwagen":
         return "F2 Kit Car"
     elif carclass == "Gruppe A":
