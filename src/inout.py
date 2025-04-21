@@ -390,12 +390,12 @@ def getPB(packet):
     pbCar = ""
     pbClass = ""
     pbOverall = ""
+    overallPbClass = ""
 
     splitsCar = []
     splitsClass = []
     splitsOverall = []
-
-
+    
     table = "TimesDatabase.csv"
 
     if "stage_result_time" in packet and os.path.isfile(table):
@@ -409,7 +409,7 @@ def getPB(packet):
         packetkey = str(location) + "_" + str(route) + "_" + str(manufacturer) + "_" + str(vehicle) + "_" + str(carclass)
         packetkeyClass = str(location) + "_" + str(route) + "_" + str(carclass)
         packetkeyOverall = str(location) + "_" + str(route)
-        overallPbClass = ""
+        
 
         if (currentTime - lastReadTime) > pbCheckCacheTime:
             with open(table, "r", encoding="utf-16") as file:
@@ -455,4 +455,5 @@ def getPB(packet):
 
         if pbOverall != "":
             pbOverall = util.pretty_print_time(pbOverall)
+
     return {"pbCar":pbCar, "pbClass":pbClass, "pbOverall":pbOverall, "overallClass":overallPbClass, "splitsCar":splitsCar, "splitsClass":splitsClass, "splitsOverall":splitsOverall}

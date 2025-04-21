@@ -162,9 +162,9 @@ def shortenClass(carclass):
     #this function is only intended for displaypurposes, the timesdatabase will contain unaltered class names.
 
     if carclass ==  "Gruppe B (Heckantrieb)":
-        return "Group B (RWD)"
+        return "Group B RWD"
     elif carclass == "Gruppe B (Allrad)":
-        return "Group B (AWD)"
+        return "Group B AWD"
     elif carclass == "F2 Bausatzwagen":
         return "F2 Kit Car"
     elif carclass == "Gruppe A":
@@ -177,7 +177,7 @@ def shortenClass(carclass):
         return "WRC-12-16"
 
     else:
-        return carclass
+        return carclass.replace("(", "").replace(")", "")
 
 def cleanGamemode(gamemode):
     return gamemode.replace("_", " ").title() #capitalizes every words first letter
