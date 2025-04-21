@@ -364,6 +364,9 @@ def visualizePacket(packet, fancy, menustr=None):
     if "game_mode" in packet:
         gamemode = util.cleanGamemode(util.resolveId(packet["game_mode"], "game_mode"))
 
+    if "vehicle_class_id" in packet:
+        carclass = util.resolveId(packet["vehicle_class_id"], "vehicle_classes")
+
     pb = inout.getPB(packet)
     pbCar = pb["pbCar"]
     pbClass = pb["pbClass"]
@@ -372,12 +375,13 @@ def visualizePacket(packet, fancy, menustr=None):
     pbsplitsCar = util.parse_stringarray_of_floats(pb["splitsCar"])
     pbsplitsClass = util.parse_stringarray_of_floats(pb["splitsClass"])
     pbsplitsOverall = util.parse_stringarray_of_floats(pb["splitsOverall"])
+    overallClass = pb["overallClass"]
 
     splitsCurrent = packet["splits"]
     splitsUpdatedAt = packet["splits_updated_at"]
 
     if car != "" or location != "" or stage != "" or gamemode != "":
-        printstring = printstring + car + " | " + location + " " + stage +  " | " + gamemode + "\n"
+        printstring = printstring + car + " (" + carclass + ") | " + location + " " + stage +  " | " + gamemode + "\n"
         
     stagetime = packet["stage_current_time"]
     secondsPastSplit = stagetime - splitsUpdatedAt
@@ -431,9 +435,9 @@ def visualizePacket(packet, fancy, menustr=None):
         else:
             printOverall = colorOverall + str(diffOverall) + util.setcolor("white")
         
-        printstring = printstring + "PB Car: " + printCar + " | Class: " + printClass + " | Overall: " + printOverall + "\n"
+        printstring = printstring + "PB Car: " + printCar + " | Class: " + printClass + " | Overall (" + overallClass + "): " + printOverall + "\n"
     else:
-        printstring = printstring + "PB Car: " + pbCar + " | Class: " + pbClass + " | Overall: " + pbOverall + "\n"
+        printstring = printstring + "PB Car: " + pbCar + " | Class: " + pbClass + " | Overall (" + overallClass + "): " + pbOverall + "\n"
         
     printstring = printstring + "\n"
 

@@ -409,6 +409,7 @@ def getPB(packet):
         packetkey = str(location) + "_" + str(route) + "_" + str(manufacturer) + "_" + str(vehicle) + "_" + str(carclass)
         packetkeyClass = str(location) + "_" + str(route) + "_" + str(carclass)
         packetkeyOverall = str(location) + "_" + str(route)
+        overallPbClass = ""
 
         if (currentTime - lastReadTime) > pbCheckCacheTime:
             with open(table, "r", encoding="utf-16") as file:
@@ -443,13 +444,15 @@ def getPB(packet):
                 if pbOverall == "":
                     pbOverall = rowTime
                     splitsOverall = getSplits(row)
+                    overallPbClass = row[9]
                 elif rowTime < pbOverall:
                     pbOverall = rowTime
                     splitsOverall = getSplits(row)
+                    overallPbClass = row[9]
 
         if pbClass != "":
             pbClass = util.pretty_print_time(pbClass)
 
         if pbOverall != "":
             pbOverall = util.pretty_print_time(pbOverall)
-    return {"pbCar":pbCar, "pbClass":pbClass, "pbOverall":pbOverall, "splitsCar":splitsCar, "splitsClass":splitsClass, "splitsOverall":splitsOverall}
+    return {"pbCar":pbCar, "pbClass":pbClass, "pbOverall":pbOverall, "overallClass":overallPbClass, "splitsCar":splitsCar, "splitsClass":splitsClass, "splitsOverall":splitsOverall}
