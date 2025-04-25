@@ -174,7 +174,7 @@ def shortenClass(carclass):
     elif carclass == "World Rally Car 2017–2021":
         return "WRC 17-21"
     elif carclass == "World Rally Car 2012 - 2016": #funny they put spaces for this one
-        return "WRC-12-16"
+        return "WRC 12-16"
 
     else:
         return carclass.replace("(", "").replace(")", "")
