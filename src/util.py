@@ -145,7 +145,7 @@ def resolveId(id, section, shorten=False):
                 break
 
     if section == "vehicles":
-        if id == 124 or id == 125 or id == 124:
+        if id == 124 or id == 125 or id == 126:
             returnString = returnString + " 24" #EA didnt update the names of the vehicles, only the ID
         elif id == 103 or id == 104 or id == 105:
             returnString = returnString + " 23"   
