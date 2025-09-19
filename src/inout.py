@@ -348,7 +348,6 @@ def updatePBTable(packet):
                     rowMatched = counter
                     #update existing row if time is faster.
                     loggedTime = float(row[10])
-                    time
 
                     if time < loggedTime:
                         overwrite = True
