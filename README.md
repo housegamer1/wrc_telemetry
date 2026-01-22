@@ -1,5 +1,8 @@
 # Simple Python EA Sports WRC Telemetry Client
 
+Probably wont develop this anymore since the game is no longer supported by the devs
+
+
 Just a little free time fun project, don't expect too much 😊<br>
 Made to run in Windows CMD (works in git bash though, did not try Linux. IO will probably crash there)<br>
 Made in python 3.<br>
