@@ -1,6 +1,13 @@
 import util   
 import inout
 
+WHITE=util.setcolor("white")
+RED=util.setcolor("red")
+YELLOW=util.setcolor("yellow")
+PURPLE=util.setcolor("purple")
+BLUE=util.setcolor("blue")
+GREEN=util.setcolor("green")
+
 
 def _visPedal(data, color):
     counter = 0.0
@@ -16,7 +23,7 @@ def _visPedal(data, color):
         parts.append("=")
         counter += 0.1
 
-    return util.setcolor("white") + "[" + util.setcolor(color) + "".join(parts) + "]"
+    return WHITE + "[" + color + "".join(parts) + WHITE + "]"
 
 def _steerRight(data):
     returnstring = _steer(data)
@@ -87,14 +94,14 @@ def _visRpm(packet):
     maxRpm = packet["vehicle_engine_rpm_max"]
     rpmPercent = packet["shiftlights_fraction"]
 
-    returnstring = util.setcolor("white") + "["
+    returnstring = WHITE + "["
 
     counter = 0.0
     while counter < rpmPercent:
         if counter > 0.8:
-            returnstring = returnstring + util.setcolor("red") + "="
+            returnstring = returnstring + RED + "="
         elif counter > 0.6:
-            returnstring = returnstring + util.setcolor("yellow") + "="
+            returnstring = returnstring + YELLOW + "="
         else :
             returnstring = returnstring + "="
         
@@ -105,21 +112,21 @@ def _visRpm(packet):
         returnstring = returnstring + " "
         counter = counter + 0.1
 
-    return returnstring + util.setcolor("white") + "]\t" + str(currentRpm) + "/" + str(maxRpm)
+    return returnstring + WHITE + "]\t" + str(currentRpm) + "/" + str(maxRpm)
 
 def _applyTempColor(temperature):
     #Highest brake temp i could force was like 600
 
     if temperature <= 0:
-        return util.setcolor("purple")
+        return PURPLE
     elif temperature < 75:      #0-75
-        return util.setcolor("blue")
+        return BLUE
     elif temperature < 250:     #75 - 250
-        return util.setcolor("green")
+        return GREEN
     elif temperature < 400:     #250 -400
-        return util.setcolor("yellow")
+        return YELLOW
     elif temperature > 400:     #400 - inf
-        return util.setcolor("red")
+        return RED
     else:
         return ""
 
@@ -134,8 +141,8 @@ def _visBrakeTemp(packet):
     brColor = _applyTempColor(br)
     blColor = _applyTempColor(bl)
 
-    returnstring = "FL [" + flColor + "||" + util.setcolor("white") +"] " + str(fl) + "\t FR [" + frColor + "||" + util.setcolor("white") + "] " + str(fr) + "\n"
-    returnstring = returnstring + "\t\t\tRL [" + blColor + "||" + util.setcolor("white") + "] " + str(bl) + "\t RR [" + brColor + "||" + util.setcolor("white") + "] " + str(br)
+    returnstring = "FL [" + flColor + "||" + WHITE +"] " + str(fl) + "\t FR [" + frColor + "||" + WHITE + "] " + str(fr) + "\n"
+    returnstring = returnstring + "\t\t\tRL [" + blColor + "||" + WHITE + "] " + str(bl) + "\t RR [" + brColor + "||" + WHITE + "] " + str(br)
 
     return returnstring
 
@@ -155,21 +162,21 @@ def _visTireState(packet):
     brColor = _applyTireStatusColor(statusBr)
     blColor = _applyTireStatusColor(statusBl)
 
-    returnstring = "FL [" + flColor + statusFl + util.setcolor("white") +"]\t FR [" + frColor + statusFr + util.setcolor("white") + "]\n"
-    returnstring = returnstring + "\t\tRL [" + blColor + statusBl + util.setcolor("white") + "]\t RR [" + brColor + statusBr + util.setcolor("white") + "]"
+    returnstring = "FL [" + flColor + statusFl + WHITE +"]\t FR [" + frColor + statusFr + WHITE + "]\n"
+    returnstring = returnstring + "\t\tRL [" + blColor + statusBl + WHITE + "]\t RR [" + brColor + statusBr + WHITE + "]"
     
     return returnstring
 
 def _applyTireStatusColor(status):
     if status == "undamaged":
-        return util.setcolor("green")
+        return GREEN
     elif status == "punctured":
-        return util.setcolor("yellow")
+        return YELLOW
     elif status == "burst":
-        return util.setcolor("red")
+        return RED
     
     #shouldnt happen
-    return util.setcolor("white")
+    return WHITE
 
 
 def _pickCharToDraw(dp, oldDp):
@@ -253,8 +260,8 @@ def _visHisto(throttle, brake):
         charToDraw = _pickCharToDraw(dp, lastDatapointDrawn)
 
         #idk why x and y flipped but it works lol
-        graph[dpT][counter] = util.setcolor("green") + charToDraw["throttle"] + util.setcolor("white")
-        graph[dpB][counter] = util.setcolor("red") + charToDraw["brake"] + util.setcolor("white")
+        graph[dpT][counter] = GREEN + charToDraw["throttle"] + WHITE
+        graph[dpB][counter] = RED + charToDraw["brake"] + WHITE
         counter = counter + 1        
         lastDatapointDrawn = dp
 
@@ -414,27 +421,27 @@ def visualizePacket(packet, fancy, menustr=None):
         diffClass = round(splitsumCurrent - splitsumPbClass, 3)
         diffOverall = round(splitsumCurrent - splitsumPbOverall, 3)
 
-        colorCar = util.setcolor("red") + "+" if diffCar > 0 else util.setcolor("green")
-        colorClass = util.setcolor("red") + "+" if diffClass > 0 else util.setcolor("green")
-        colorOverall = util.setcolor("red") + "+" if diffOverall > 0 else util.setcolor("green")
+        colorCar = RED + "+" if diffCar > 0 else GREEN
+        colorClass = RED + "+" if diffClass > 0 else GREEN
+        colorOverall = RED + "+" if diffOverall > 0 else GREEN
 
         printCar = ""
         if splitsumPbCar == 0:
-            printCar = util.setcolor("yellow") + " -- " + util.setcolor("white")
+            printCar = YELLOW + " -- " + WHITE
         else:
-            printCar = colorCar + str(diffCar) + util.setcolor("white")
+            printCar = colorCar + str(diffCar) + WHITE
 
         printClass = ""
         if splitsumPbClass == 0:
-            printClass = util.setcolor("yellow") + " -- " + util.setcolor("white")
+            printClass = YELLOW + " -- " + WHITE
         else:
-            printClass = colorClass + str(diffClass) + util.setcolor("white")
+            printClass = colorClass + str(diffClass) + WHITE
 
         printOverall = ""
         if splitsumPbOverall == 0:
-            printOverall = util.setcolor("yellow") + " -- " + util.setcolor("white")
+            printOverall = YELLOW + " -- " + WHITE
         else:
-            printOverall = colorOverall + str(diffOverall) + util.setcolor("white")
+            printOverall = colorOverall + str(diffOverall) + WHITE
         
         printstring = printstring + "PB Car: " + printCar + " | Class: " + printClass + " | Overall (" + overallClass + "): " + printOverall + "\n"
     else:
@@ -443,16 +450,16 @@ def visualizePacket(packet, fancy, menustr=None):
     printstring = printstring + "\n"
 
     if "vehicle_throttle" in packet:
-        printstring = printstring + ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], "green") + "\t"
+        printstring = printstring + ">>>   Throttle:\t\t" + _visPedal(packet["vehicle_throttle"], GREEN) + "\t"
 
     if "vehicle_brake" in packet:
-        printstring = printstring + ">>>   Brake:\t\t" + _visPedal(packet["vehicle_brake"], "red") + "\n"
+        printstring = printstring + ">>>   Brake:\t\t" + _visPedal(packet["vehicle_brake"], RED) + "\n"
 
     if "vehicle_clutch" in packet:        
-        printstring = printstring + ">>>   Clutch:\t\t" + _visPedal(packet["vehicle_clutch"], "white") + "\t"
+        printstring = printstring + ">>>   Clutch:\t\t" + _visPedal(packet["vehicle_clutch"], WHITE) + "\t"
 
     if "vehicle_handbrake" in packet:
-        printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], "red") + "\n"
+        printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], RED) + "\n"
 
     if "stage_current_distance" in packet and "stage_length" in packet:
         printstring = printstring + ">>>   Distance:\t\t" + str(util.mToKm(packet["stage_current_distance"])) + "/" + str(util.mToKm(packet["stage_length"])) + " km\t"
@@ -472,9 +479,9 @@ def visualizePacket(packet, fancy, menustr=None):
 
         slip = ""
         if transspeed > gpsspeed * 1.25: #should roughly take care of the losses. but gets unreliable at high speed
-            slip = util.setcolor("purple") + "**SLIP**"+ util.setcolor("white") 
+            slip = PURPLE + "**SLIP**"+ WHITE
         elif transspeed < gpsspeed * 0.5: 
-            slip = util.setcolor("purple") + "**LOCKUP**"+ util.setcolor("white") 
+            slip = PURPLE + "**LOCKUP**"+ WHITE
 
         if packet["vehicle_speed"] >= 100:
             printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\t" #otherwise it pops to the right when we go over 100.
