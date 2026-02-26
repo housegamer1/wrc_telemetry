@@ -1,21 +1,22 @@
 import util   
 import inout
 
+
 def _visPedal(data, color):
-    returnstring = util.setcolor("white") + "[" + util.setcolor(color)
     counter = 0.0
     
     #pedal position in "=" characters / 10
+    parts = []
     while counter < data:
-        returnstring = returnstring + "="
-        counter = counter + 0.1
-    
+        parts.append("=")
+        counter += 0.1
+
     #fill rest with spaces
     while counter < 1.0:
-        returnstring = returnstring + " "
-        counter = counter + 0.1
+        parts.append("=")
+        counter += 0.1
 
-    return returnstring + util.setcolor("white") + "]" 
+    return util.setcolor("white") + "[" + util.setcolor(color) + "".join(parts) + "]"
 
 def _steerRight(data):
     returnstring = _steer(data)
