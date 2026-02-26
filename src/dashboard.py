@@ -20,7 +20,7 @@ def _visPedal(data, color):
 
     #fill rest with spaces
     while counter < 1.0:
-        parts.append("=")
+        parts.append(" ")
         counter += 0.1
 
     return WHITE + "[" + color + "".join(parts) + WHITE + "]"
