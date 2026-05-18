@@ -417,6 +417,24 @@ def visualizePacket(packet, fancy, menustr=None):
     
             splitcount = splitcount + 1
 
+        status = packet["stage_result_status"]
+        shakedown = packet["stage_shakedown"]
+        gamemodeName = util.resolveId(gamemode, "game_mode")
+        if util.resolveId(status, "stage_result_status") == "finished" and shakedown == False and gamemodeName != "test_drive" and gamemodeName != "rally_school":
+            #Code runs only when stage is finished.
+            #If the pb has no splits, use the full recorded time at stage end, since sum of all splits = final time
+
+            pbraw = pb["pbCarRaw"]
+            classraw = pb["pbClassRaw"]
+            overallraw = pb["pbOverallRaw"]
+
+            if splitsumPbCar == 0:
+                splitsumPbCar = pbraw if pbraw != "" else 0
+            if splitsumPbClass == 0:
+                splitsumPbClass = classraw if classraw != "" else 0
+            if splitsumPbOverall == 0:
+                splitsumPbOverall = overallraw if overallraw != "" else 0
+
         diffCar = round(splitsumCurrent - splitsumPbCar, 3)
         diffClass = round(splitsumCurrent - splitsumPbClass, 3)
         diffOverall = round(splitsumCurrent - splitsumPbOverall, 3)

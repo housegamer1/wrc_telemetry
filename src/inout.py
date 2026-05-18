@@ -390,6 +390,9 @@ def getPB(packet):
     pbClass = ""
     pbOverall = ""
     overallPbClass = ""
+    pbCarRaw = ""
+    pbClassRaw = ""
+    pbOverallRaw =""
 
     splitsCar = []
     splitsClass = []
@@ -427,6 +430,7 @@ def getPB(packet):
             if packetkey == rowkey: #this one is unique so no need for checking if the time is lower
                 loggedTime = float(row[10])
                 pbCar = util.pretty_print_time(loggedTime)
+                pbCarRaw = loggedTime
                 splitsCar = getSplits(row)
 
             if packetkeyClass == rowkeyClass:
@@ -450,9 +454,11 @@ def getPB(packet):
                     overallPbClass = row[9]
 
         if pbClass != "":
-            pbClass = util.pretty_print_time(pbClass)
+                pbClassRaw = pbClass
+                pbClass = util.pretty_print_time(pbClass)
 
         if pbOverall != "":
-            pbOverall = util.pretty_print_time(pbOverall)
+                pbOverallRaw = pbOverall
+                pbOverall = util.pretty_print_time(pbOverall)
 
-    return {"pbCar":pbCar, "pbClass":pbClass, "pbOverall":pbOverall, "overallClass":overallPbClass, "splitsCar":splitsCar, "splitsClass":splitsClass, "splitsOverall":splitsOverall}
+    return {"pbCar":pbCar, "pbClass":pbClass, "pbOverall":pbOverall, "pbCarRaw":pbCarRaw, "pbClassRaw":pbClassRaw, "pbOverallRaw":pbOverallRaw, "overallClass":overallPbClass, "splitsCar":splitsCar, "splitsClass":splitsClass, "splitsOverall":splitsOverall}
