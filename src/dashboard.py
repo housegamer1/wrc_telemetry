@@ -347,8 +347,9 @@ def _visAccel(fw, sw, resetMaxG):
 
     return returnstring
 
-
+distanceAtFinish = 0
 def visualizePacket(packet, fancy, menustr=None):
+    global distanceAtFinish
     
     printstring = ""
 
@@ -433,6 +434,9 @@ def visualizePacket(packet, fancy, menustr=None):
             if "pbDistance" in pb:
                 pbDistance = pb["pbDistance"]
 
+            if distanceAtFinish == 0:
+                distanceAtFinish = packet["stage_current_distance"]
+
             if splitsumPbCar == 0:
                 splitsumPbCar = pbraw if pbraw != "" else 0
             if splitsumPbClass == 0:
@@ -485,9 +489,14 @@ def visualizePacket(packet, fancy, menustr=None):
         printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], RED) + "\n"
 
     if "stage_current_distance" in packet and "stage_length" in packet:
+
+        #reset at stage starts
+        if packet["stage_current_distance"] == 0:
+            distanceAtFinish = 0
+
         distance = str(util.mToKm(packet["stage_current_distance"])) + "/" + str(util.mToKm(packet["stage_length"])) + " km\t"
         if pbDistance != "":
-            distance = packet["stage_current_distance"] - int(pbDistance)
+            distance = distanceAtFinish - int(pbDistance)
             if distance < 0:
                 distance = GREEN + str(distance) + WHITE
             elif distance > 0:
@@ -495,7 +504,7 @@ def visualizePacket(packet, fancy, menustr=None):
             else:
                 distance = YELLOW + str(distance) + WHITE
 
-            distance = distance + " m\t"
+            distance = distance + " m\t\t"
 
         printstring = printstring + ">>>   Distance:\t\t" + distance
 

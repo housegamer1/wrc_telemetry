@@ -7,6 +7,7 @@ import ast
 import json
 import csv
 import datetime
+import dashboard
 
 currentScreen = 2
 recordingStatus = 0
@@ -324,7 +325,7 @@ def updatePBTable(packet):
         shakedown = packet["stage_shakedown"]
         packetkey = str(location) + "_" + str(route) + "_" + str(manufacturer) + "_" + str(vehicle) + "_" + str(carclass)
         splits = "" if packet["splits"] == [] else packet["splits"]
-        distance = packet["stage_current_distance"]
+        distance = dashboard.distanceAtFinish
         packetRow = [location, locationName, route, routeName, manufacturer, manufacturerName, vehicle, vehicleName, carclass, carclassName, time, timeReadable, penalty, gamemodeName, str(datetime.datetime.now()), splits, distance]
 
         #only add when finished, not when dnf.
