@@ -380,6 +380,8 @@ def visualizePacket(packet, fancy, menustr=None):
     pbClass = pb["pbClass"]
     pbOverall = pb["pbOverall"]
 
+    pbDistance = ""
+
     pbsplitsCar = util.parse_stringarray_of_floats(pb["splitsCar"])
     pbsplitsClass = util.parse_stringarray_of_floats(pb["splitsClass"])
     pbsplitsOverall = util.parse_stringarray_of_floats(pb["splitsOverall"])
@@ -427,6 +429,9 @@ def visualizePacket(packet, fancy, menustr=None):
             pbraw = pb["pbCarRaw"]
             classraw = pb["pbClassRaw"]
             overallraw = pb["pbOverallRaw"]
+
+            if "pbDistance" in pb:
+                pbDistance = pb["pbDistance"]
 
             if splitsumPbCar == 0:
                 splitsumPbCar = pbraw if pbraw != "" else 0
@@ -480,7 +485,20 @@ def visualizePacket(packet, fancy, menustr=None):
         printstring = printstring + ">>>   Handbrake:\t" + _visPedal(packet["vehicle_handbrake"], RED) + "\n"
 
     if "stage_current_distance" in packet and "stage_length" in packet:
-        printstring = printstring + ">>>   Distance:\t\t" + str(util.mToKm(packet["stage_current_distance"])) + "/" + str(util.mToKm(packet["stage_length"])) + " km\t"
+        distance = str(util.mToKm(packet["stage_current_distance"])) + "/" + str(util.mToKm(packet["stage_length"])) + " km\t"
+        if pbDistance != "":
+            distance = packet["stage_current_distance"] - int(pbDistance)
+            if distance < 0:
+                distance = GREEN + str(distance) + WHITE
+            elif distance > 0:
+                distance = RED + str(distance) + WHITE
+            else:
+                distance = YELLOW + str(distance) + WHITE
+
+            distance = distance + " m\t"
+
+        printstring = printstring + ">>>   Distance:\t\t" + distance
+
 
     if "vehicle_steering" in packet:    
         printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\n"

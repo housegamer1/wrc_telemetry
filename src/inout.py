@@ -324,7 +324,8 @@ def updatePBTable(packet):
         shakedown = packet["stage_shakedown"]
         packetkey = str(location) + "_" + str(route) + "_" + str(manufacturer) + "_" + str(vehicle) + "_" + str(carclass)
         splits = "" if packet["splits"] == [] else packet["splits"]
-        packetRow = [location, locationName, route, routeName, manufacturer, manufacturerName, vehicle, vehicleName, carclass, carclassName, time, timeReadable, penalty, gamemodeName, str(datetime.datetime.now()), splits]
+        distance = packet["stage_current_distance"]
+        packetRow = [location, locationName, route, routeName, manufacturer, manufacturerName, vehicle, vehicleName, carclass, carclassName, time, timeReadable, penalty, gamemodeName, str(datetime.datetime.now()), splits, distance]
 
         #only add when finished, not when dnf.
         if util.resolveId(status, "stage_result_status") == "finished" and shakedown == False and gamemodeName != "test_drive" and gamemodeName != "rally_school":
@@ -397,6 +398,8 @@ def getPB(packet):
     splitsCar = []
     splitsClass = []
     splitsOverall = []
+
+    pbDistance = ""
     
     table = "TimesDatabase.csv"
 
@@ -432,6 +435,7 @@ def getPB(packet):
                 pbCar = util.pretty_print_time(loggedTime)
                 pbCarRaw = loggedTime
                 splitsCar = getSplits(row)
+                pbDistance = row[16] if len(row)>16 else ""
 
             if packetkeyClass == rowkeyClass:
                 rowTime = float(row[10])
@@ -461,4 +465,4 @@ def getPB(packet):
                 pbOverallRaw = pbOverall
                 pbOverall = util.pretty_print_time(pbOverall)
 
-    return {"pbCar":pbCar, "pbClass":pbClass, "pbOverall":pbOverall, "pbCarRaw":pbCarRaw, "pbClassRaw":pbClassRaw, "pbOverallRaw":pbOverallRaw, "overallClass":overallPbClass, "splitsCar":splitsCar, "splitsClass":splitsClass, "splitsOverall":splitsOverall}
+    return {"pbCar":pbCar, "pbClass":pbClass, "pbOverall":pbOverall, "pbCarRaw":pbCarRaw, "pbClassRaw":pbClassRaw, "pbOverallRaw":pbOverallRaw, "overallClass":overallPbClass, "splitsCar":splitsCar, "splitsClass":splitsClass, "splitsOverall":splitsOverall, "pbDistance":pbDistance}
