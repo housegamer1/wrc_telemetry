@@ -280,13 +280,26 @@ def _correctGraphTransition(graph):
     # /
     #/
     # this scans left to right instead of right to left (like the live timeline would)
-    for row in graph:
+    height = len(graph)
+
+    for y, row in enumerate(graph):
         for x in range(len(row) - 1):
+
+            #flatten the top
             if row[x] == GREEN + "/" + WHITE and row[x + 1] == GREEN + "_" + WHITE:
                 row[x] = GREEN + "_" + WHITE
 
+                # then move rising flank down-left, unless already a vertical connector
+                if y + 1 < height and x > 0:
+                    if graph[y + 1][x - 1] != GREEN + "|" + WHITE and graph[y + 1][x] != GREEN + "|" + WHITE:
+                        graph[y + 1][x - 1] = GREEN + "/" + WHITE
+
             elif row[x] == RED + "/" + WHITE and row[x + 1] == RED + "_" + WHITE:
                 row[x] = RED + "_" + WHITE
+
+                if y + 1 < height and x > 0:
+                    if graph[y + 1][x - 1] != RED + "|" + WHITE and graph[y + 1][x - 1] != RED + "|" + WHITE:
+                        graph[y + 1][x - 1] = RED + "/" + WHITE
 
 def _fillVerticalGap(previousY, currentY, x, color):
     if previousY is None:
