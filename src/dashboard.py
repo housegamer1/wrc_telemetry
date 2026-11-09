@@ -1,4 +1,4 @@
-import util   
+import util
 import inout
 
 WHITE=util.setcolor("white")
@@ -11,7 +11,7 @@ GREEN=util.setcolor("green")
 
 def _visPedal(data, color):
     counter = 0.0
-    
+
     #pedal position in "=" characters / 10
     parts = []
     while counter < data:
@@ -32,8 +32,8 @@ def _steerRight(data):
     while len(returnstring) < 10:
         returnstring = returnstring + " "
 
-    #add middle 
-    returnstring = "          =" + returnstring 
+    #add middle
+    returnstring = "          =" + returnstring
 
     return returnstring
 
@@ -44,7 +44,7 @@ def _steerLeft(data):
     while len(returnstring) < 10:
         returnstring = " " + returnstring
 
-    #add middle 
+    #add middle
     returnstring = returnstring + "="
 
     #fill rest with spaces
@@ -58,7 +58,7 @@ def _steer(data):
     while counter < data:
         returnstring = returnstring + "="
         counter = round(counter + 0.1, 1) #no need to stretch the indicator to twice the length. round to avoid 0.00000000000000001 errors
-    
+
     return returnstring
 
 def _visSteering(data):
@@ -88,7 +88,7 @@ def _visGear(packet):
         return "N"
     else:
         return str(currentGear) + "/" + str(maxGears)
-    
+
 def _visRpm(packet):
     currentRpm = packet["vehicle_engine_rpm_current"]
     maxRpm = packet["vehicle_engine_rpm_max"]
@@ -104,7 +104,7 @@ def _visRpm(packet):
             returnstring = returnstring + YELLOW + "="
         else :
             returnstring = returnstring + "="
-        
+
         counter = counter + 0.1
 
     #fill rest with space
@@ -164,7 +164,7 @@ def _visTireState(packet):
 
     returnstring = "FL [" + flColor + statusFl + WHITE +"]\t FR [" + frColor + statusFr + WHITE + "]\n"
     returnstring = returnstring + "\t\tRL [" + blColor + statusBl + WHITE + "]\t RR [" + brColor + statusBr + WHITE + "]"
-    
+
     return returnstring
 
 def _applyTireStatusColor(status):
@@ -174,7 +174,7 @@ def _applyTireStatusColor(status):
         return YELLOW
     elif status == "burst":
         return RED
-    
+
     #shouldnt happen
     return WHITE
 
@@ -187,7 +187,7 @@ def _pickCharToDraw(dp, oldDp):
 
     if not oldDp:
         return chars
-    
+
     for key in ("throttle", "brake"):
         current = dp[key]
         previous = oldDp[key]
@@ -197,7 +197,7 @@ def _pickCharToDraw(dp, oldDp):
                 chars[key] = "/"
             elif current > previous:
                 chars[key] = "\\"
-  
+
 
     return chars
 
@@ -206,7 +206,7 @@ previousData = [] #
 def _visHisto(throttle, brake):
     global previousData
 
-    width = 30 #equal to age 
+    width = 30 #equal to age
     if inout.toggleAccelerometer == 0:
         width = 90
 
@@ -214,7 +214,7 @@ def _visHisto(throttle, brake):
         previousData.clear()
 
     height = 11 #11 so WOT (10) will not out of bounds
-    
+
     dataPoint = {
         "throttle" : 10 - round(throttle *10), #value comes as 0.0 - 1.0
         "brake" : 10 - round(brake * 10)
@@ -232,7 +232,7 @@ def _visHisto(throttle, brake):
     previousData.append(dataPoint) #append current data point
 
     graph = [[" " for x in range(width)] for y in range(height)] # draw empty graph
-    
+
     #draw graph
     amountOfSkippedFields = width - len(previousData)
     counter = 0
@@ -242,7 +242,7 @@ def _visHisto(throttle, brake):
             counter = counter + 1
             continue
 
-        dpT = dp["throttle"] 
+        dpT = dp["throttle"]
         dpB = dp["brake"]
 
         # Fill gaps between consecutive throttle/brake values
@@ -259,7 +259,7 @@ def _visHisto(throttle, brake):
         graph[dpT][counter] = GREEN + charToDraw["throttle"] + WHITE
         graph[dpB][counter] = RED + charToDraw["brake"] + WHITE
 
-        counter = counter + 1 
+        counter = counter + 1
         lastDatapointDrawn = dp
 
     # directly modify the graph to check previous points for /_ transition and smooth them.
@@ -313,7 +313,7 @@ maxGfw = 0
 maxGsw = 0
 def _visAccel(fw, sw, resetMaxG):
 
-    width = 30 
+    width = 30
     height = 10
 
     graph = [["." for x in range(width)] for y in range(height)] # draw empty graph
@@ -327,12 +327,12 @@ def _visAccel(fw, sw, resetMaxG):
     centerSw = round(width /2)
 
     adjustFw = round(fw / 9.81, 1) #these are m/s² so convert to g
-    adjustSw = round(sw / 9.81, 1) 
+    adjustSw = round(sw / 9.81, 1)
 
     #offset from center and pronounce visualisation.
     #pronounce sw a lot more, since the graph is 3:1 stretched
     newFw = centerFw + round(adjustFw * 2)
-    newSw = centerSw + round(adjustSw * 6) 
+    newSw = centerSw + round(adjustSw * 6)
 
     #cap the values
     newFw = newFw if newFw < height else (height -1)
@@ -353,7 +353,7 @@ def _visAccel(fw, sw, resetMaxG):
 
     if abs(adjustFw) > abs(maxGfw):
         maxGfw = adjustFw
-    
+
     if abs(adjustSw) > abs(maxGsw):
         maxGsw = adjustSw
 
@@ -380,7 +380,7 @@ def _visAccel(fw, sw, resetMaxG):
 distanceAtFinish = 0
 def visualizePacket(packet, fancy, menustr=None):
     global distanceAtFinish
-    
+
     printstring = ""
 
     #TODO could do science with diff setting vs cp (contact patch) speed
@@ -423,7 +423,7 @@ def visualizePacket(packet, fancy, menustr=None):
 
     if car != "" or location != "" or stage != "" or gamemode != "":
         printstring = printstring + car + " (" + carclass + ") | " + location + " " + stage +  " | " + gamemode + "\n"
-        
+
     stagetime = packet["stage_current_time"]
     secondsPastSplit = stagetime - splitsUpdatedAt
     if splitsCurrent != [] and secondsPastSplit < 5 and stagetime > 5: #game keeps previous split field filled from old runs, dont show that after we just set off from the startline
@@ -436,7 +436,7 @@ def visualizePacket(packet, fancy, menustr=None):
         splitcount = 0
         for currentSplitsEntry in splitsCurrent:
             #loop limited to the amount of splits the player has already driven in the current run.
-            
+
             splitsumCurrent = splitsumCurrent + currentSplitsEntry
 
             if len(pbsplitsCar) >= (splitcount +1):
@@ -447,7 +447,7 @@ def visualizePacket(packet, fancy, menustr=None):
 
             if len(pbsplitsOverall) >= (splitcount +1):
                 splitsumPbOverall = splitsumPbOverall + pbsplitsOverall[splitcount]
-    
+
             splitcount = splitcount + 1
 
         status = packet["stage_result_status"]
@@ -499,11 +499,11 @@ def visualizePacket(packet, fancy, menustr=None):
             printOverall = YELLOW + " -- " + WHITE
         else:
             printOverall = colorOverall + str(diffOverall) + WHITE
-        
+
         printstring = printstring + "PB Car: " + printCar + " | Class: " + printClass + " | Overall (" + overallClass + "): " + printOverall + "\n"
     else:
         printstring = printstring + "PB Car: " + pbCar + " | Class: " + pbClass + " | Overall (" + overallClass + "): " + pbOverall + "\n"
-        
+
     printstring = printstring + "\n"
 
     if "vehicle_throttle" in packet:
@@ -512,7 +512,7 @@ def visualizePacket(packet, fancy, menustr=None):
     if "vehicle_brake" in packet:
         printstring = printstring + ">>>   Brake:\t\t" + _visPedal(packet["vehicle_brake"], RED) + "\n"
 
-    if "vehicle_clutch" in packet:        
+    if "vehicle_clutch" in packet:
         printstring = printstring + ">>>   Clutch:\t\t" + _visPedal(packet["vehicle_clutch"], WHITE) + "\t"
 
     if "vehicle_handbrake" in packet:
@@ -539,7 +539,7 @@ def visualizePacket(packet, fancy, menustr=None):
         printstring = printstring + ">>>   Distance:\t\t" + distance
 
 
-    if "vehicle_steering" in packet:    
+    if "vehicle_steering" in packet:
         printstring = printstring + ">>>   Steering:\t\t" + _visSteering(packet["vehicle_steering"]) + "\n"
 
     if "vehicle_gear_maximum" in packet and "vehicle_gear_index" in packet and "vehicle_gear_index_reverse" in packet and "vehicle_gear_index_neutral" in packet:
@@ -555,7 +555,7 @@ def visualizePacket(packet, fancy, menustr=None):
         slip = ""
         if transspeed > gpsspeed * 1.25: #should roughly take care of the losses. but gets unreliable at high speed
             slip = PURPLE + "**SLIP**"+ WHITE
-        elif transspeed < gpsspeed * 0.5: 
+        elif transspeed < gpsspeed * 0.5:
             slip = PURPLE + "**LOCKUP**"+ WHITE
 
         if packet["vehicle_speed"] >= 100:
@@ -564,7 +564,7 @@ def visualizePacket(packet, fancy, menustr=None):
             printstring = printstring + ">>>   Gps Speed:\t" + str(packet["vehicle_speed"]) + " Km/h\t\t"
 
         printstring = printstring + ">>>   Trans Speed:\t" + str(packet["vehicle_transmission_speed"]) + " Km/h  " + slip + "\n"
-        
+
 
     tireString = ""
     if "vehicle_tyre_state_bl" in packet and "vehicle_tyre_state_br" in packet and "vehicle_tyre_state_fl" in packet and "vehicle_tyre_state_fr" in packet:
@@ -589,7 +589,7 @@ def visualizePacket(packet, fancy, menustr=None):
             reset = packet["stage_current_distance"] #reset max g logger on restart, default: never reset
 
         accelstring = ">>>   Accel:\t" + _visAccel(packet["vehicle_acceleration_z"], packet["vehicle_acceleration_x"], reset) + "\n"
-        
+
     if histoString != "" or accelstring != "":
         printstring = printstring + util.drawSideBySide(histoString, accelstring)
 
