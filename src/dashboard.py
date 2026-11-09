@@ -1,6 +1,5 @@
 import util
 import inout
-import re
 
 WHITE=util.setcolor("white")
 RED=util.setcolor("red")
@@ -269,37 +268,7 @@ def _visHisto(throttle, brake):
         returnstring = returnstring + "\n"
         rowcounter += 1
 
-
-
     return returnstring
-
-def _getLastDatapoint():
-    global renderedHisto
-    #return the throttle and brake value (as in row number of the graph) of last datapoint in the graph.
-    datapoint = {
-        "throttle": None,
-        "brake": None
-    }
-
-    if not renderedHisto or not renderedHisto[0]:
-        return {}
-
-    lastColumn = len(renderedHisto[0]) - 1
-
-    for y, row in enumerate(renderedHisto):
-        cell = row[lastColumn]
-
-        if cell.startswith(GREEN):
-            datapoint["throttle"] = y
-
-        elif cell.startswith(RED):
-            datapoint["brake"] = y
-
-    # Return empty if no datapoints have been drawn yet
-    if datapoint["throttle"] is None or datapoint["brake"] is None:
-        return {}
-
-    return datapoint
 
 def _correctGraphTransition(graph):
     # post process the graph to convert transitions from
