@@ -185,36 +185,24 @@ def _pickCharToDraw(dp, oldDp):
         "brake": "_"
     }
 
-    if oldDp == {}:
-        return chars        
+    if not oldDp:
+        return chars
+    
+    for key in ("throttle", "brake"):
+        current = dp[key]
+        previous = oldDp[key]
 
-    dpT = dp["throttle"]
-    dpB = dp["brake"]
-    odpT = oldDp["throttle"]
-    odpB = oldDp["brake"]
-
-    #print("dpt: " + str(dpT) + " old dpt: "+ str(odpT))
-
-    if dpT != 0 and dpT != 10: #dont depict rising if max already reached this tick
-        #inverse logic as the graph flipped the values to that 0/0 coord is bottom left
-        if dpT < odpT: 
-            chars["throttle"] = "/"
-        elif dpT > odpT:
-            chars["throttle"] = "\\"
-        else:
-            chars["throttle"] = "_"
-
-    if dpB != 0  and dpB != 10:
-        if dpB < odpB: 
-            chars["brake"] = "/"
-        elif dpB > odpB:
-            chars["brake"] = "\\"
-        else:
-            chars["brake"] = "_"   
+        if current != 0 and current != 10: #dont depict rising if max already reached this tick
+            if current < previous:
+                chars[key] = "/"
+            elif current > previous:
+                chars[key] = "\\"
+  
 
     return chars
 
-previousData = []
+previousData = [] #
+#renderedHisto = [] #a list of strings to keep the 88 oldest datapoints (11 rows a 88 characers, since width is 90)
 def _visHisto(throttle, brake):
     global previousData
 
@@ -257,15 +245,27 @@ def _visHisto(throttle, brake):
         dpT = dp["throttle"] 
         dpB = dp["brake"]
 
+        # Fill gaps between consecutive throttle/brake values
+        # happens before rewrite, so that if current column is determined to be a "|", it will be overwritten
+        # with actual input / \ or _.
+        # directly modifies the graph
+        if lastDatapointDrawn:
+            _fillVerticalGap(graph, lastDatapointDrawn["throttle"], dpT, counter, GREEN)
+            _fillVerticalGap(graph, lastDatapointDrawn["brake"], dpB, counter, RED)
+
         charToDraw = _pickCharToDraw(dp, lastDatapointDrawn)
 
         #idk why x and y flipped but it works lol
         graph[dpT][counter] = GREEN + charToDraw["throttle"] + WHITE
         graph[dpB][counter] = RED + charToDraw["brake"] + WHITE
-        counter = counter + 1        
+
+        counter = counter + 1 
         lastDatapointDrawn = dp
 
-    #build return
+    # directly modify the graph to check previous points for /_ transition and smooth them.
+    _correctGraphTransition(graph)
+
+    #build return, the graph is finished here.
     returnstring = ""
     firstRow = True
     for row in graph:
@@ -277,6 +277,36 @@ def _visHisto(throttle, brake):
         returnstring = returnstring + "\n"
 
     return returnstring
+
+def _correctGraphTransition(graph):
+    # post process the graph to convert transitions from
+    #  /_____
+    # /
+    #/
+    # to
+    #  _______
+    # /
+    #/
+    # this scans left to right instead of right to left (like the live timeline would)
+    for row in graph:
+        for x in range(len(row) - 1):
+            if row[x] == GREEN + "/" + WHITE and row[x + 1] == GREEN + "_" + WHITE:
+                row[x] = GREEN + "_" + WHITE
+
+            elif row[x] == RED + "/" + WHITE and row[x + 1] == RED + "_" + WHITE:
+                row[x] = RED + "_" + WHITE
+
+def _fillVerticalGap(graph, previousY, currentY, x, color):
+    if previousY is None:
+        return
+
+    difference = currentY - previousY
+    if abs(difference) <= 1:
+        return
+
+    step = 1 if difference > 0 else -1
+    for y in range(previousY + step, currentY, step):
+        graph[y][x] = color + "|" + WHITE
 
 previousAccel = []
 maxGfw = 0
