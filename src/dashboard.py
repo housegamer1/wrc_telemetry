@@ -1,5 +1,6 @@
 import util
 import inout
+import re
 
 WHITE=util.setcolor("white")
 RED=util.setcolor("red")
@@ -201,82 +202,104 @@ def _pickCharToDraw(dp, oldDp):
 
     return chars
 
-previousData = [] #
-#renderedHisto = [] #a list of strings to keep the 88 oldest datapoints (11 rows a 88 characers, since width is 90)
+renderedHisto = [] #a list of "cells" containing [color modifier + character + color resetter]. 
+lastDatapointDrawn = {}
 def _visHisto(throttle, brake):
-    global previousData
+    global renderedHisto
+    global lastDatapointDrawn
 
-    width = 30 #equal to age
+    height = 11 #11 so WOT (10) will not out of bounds
+    width = 30 #equal to age    
     if inout.toggleAccelerometer == 0:
         width = 90
 
-    if width == 30 and len(previousData) > 30:
-        previousData.clear()
+    #initialize or clear when changing width due to accelerometer toggle
+    if not renderedHisto or len(renderedHisto[0]) > width:
+        renderedHisto = [[] for _ in range(height)]
 
-    height = 11 #11 so WOT (10) will not out of bounds
+    # Append a new blank column to every row to ensure the line scans in sync for each row
+    for row in renderedHisto:
+        row.append(" ")
 
-    dataPoint = {
+    # make sure the rendered histo does not get too long.
+    if len(renderedHisto[0]) > width:
+        for row in renderedHisto:
+            row.pop(0) #pops out an entie "cell", so includes the color modifiers
+
+    currentDataPoint = {
         "throttle" : 10 - round(throttle *10), #value comes as 0.0 - 1.0
         "brake" : 10 - round(brake * 10)
     }
 
+    dpT = currentDataPoint["throttle"]
+    dpB = currentDataPoint["brake"]
+    column = len(renderedHisto[0]) - 1
 
-    if len(previousData) == width:
-        #buffer is full, remove old entry, copy to new list
-        previousData.pop(0)
-        newHist = []
-        for entry in previousData:
-            newHist.append(entry)
-        previousData = newHist
+    # Fill gaps between consecutive throttle/brake values
+    # happens before rewrite, so that if current column is determined to be a "|", it will be overwritten
+    # with actual input / \ or _.
+    # directly modifies the graph
+    
+    if lastDatapointDrawn:
+        _fillVerticalGap(lastDatapointDrawn["throttle"], dpT, column, GREEN)
+        _fillVerticalGap(lastDatapointDrawn["brake"], dpB, column, RED)
 
-    previousData.append(dataPoint) #append current data point
+    charToDraw = _pickCharToDraw(currentDataPoint, lastDatapointDrawn)
 
-    graph = [[" " for x in range(width)] for y in range(height)] # draw empty graph
-
-    #draw graph
-    amountOfSkippedFields = width - len(previousData)
-    counter = 0
-    lastDatapointDrawn = {}
-    for dp in previousData:
-        while counter < amountOfSkippedFields: #fast forward to the columns we need to draw
-            counter = counter + 1
-            continue
-
-        dpT = dp["throttle"]
-        dpB = dp["brake"]
-
-        # Fill gaps between consecutive throttle/brake values
-        # happens before rewrite, so that if current column is determined to be a "|", it will be overwritten
-        # with actual input / \ or _.
-        # directly modifies the graph
-        if lastDatapointDrawn:
-            _fillVerticalGap(graph, lastDatapointDrawn["throttle"], dpT, counter, GREEN)
-            _fillVerticalGap(graph, lastDatapointDrawn["brake"], dpB, counter, RED)
-
-        charToDraw = _pickCharToDraw(dp, lastDatapointDrawn)
-
-        #idk why x and y flipped but it works lol
-        graph[dpT][counter] = GREEN + charToDraw["throttle"] + WHITE
-        graph[dpB][counter] = RED + charToDraw["brake"] + WHITE
-
-        counter = counter + 1
-        lastDatapointDrawn = dp
+    # idk why x and y flipped but it works lol.
+    # construct and write teh "cells" to the end of the histo
+    renderedHisto[dpT][column] = GREEN + charToDraw["throttle"] + WHITE
+    renderedHisto[dpB][column] = RED + charToDraw["brake"] + WHITE
 
     # directly modify the graph to check previous points for /_ transition and smooth them.
-    _correctGraphTransition(graph)
+    _correctGraphTransition(renderedHisto)
+
+    # Store current datapoint for the next frame. not redrawn, only for decisionmaking
+    lastDatapointDrawn = currentDataPoint.copy()
 
     #build return, the graph is finished here.
     returnstring = ""
-    firstRow = True
-    for row in graph:
-        if firstRow:
-            returnstring = returnstring + util.listToString(row, False)
-            firstRow = False
+    for rowcounter, row in enumerate(renderedHisto):
+        rowString = util.listToString(row, False)
+
+        if rowcounter == 0:
+            returnstring = returnstring + rowString
         else:
-            returnstring = returnstring + "\t\t" + util.listToString(row, False)
+            returnstring = returnstring + "\t\t" + rowString
         returnstring = returnstring + "\n"
+        rowcounter += 1
+
+
 
     return returnstring
+
+def _getLastDatapoint():
+    global renderedHisto
+    #return the throttle and brake value (as in row number of the graph) of last datapoint in the graph.
+    datapoint = {
+        "throttle": None,
+        "brake": None
+    }
+
+    if not renderedHisto or not renderedHisto[0]:
+        return {}
+
+    lastColumn = len(renderedHisto[0]) - 1
+
+    for y, row in enumerate(renderedHisto):
+        cell = row[lastColumn]
+
+        if cell.startswith(GREEN):
+            datapoint["throttle"] = y
+
+        elif cell.startswith(RED):
+            datapoint["brake"] = y
+
+    # Return empty if no datapoints have been drawn yet
+    if datapoint["throttle"] is None or datapoint["brake"] is None:
+        return {}
+
+    return datapoint
 
 def _correctGraphTransition(graph):
     # post process the graph to convert transitions from
@@ -296,7 +319,7 @@ def _correctGraphTransition(graph):
             elif row[x] == RED + "/" + WHITE and row[x + 1] == RED + "_" + WHITE:
                 row[x] = RED + "_" + WHITE
 
-def _fillVerticalGap(graph, previousY, currentY, x, color):
+def _fillVerticalGap(previousY, currentY, x, color):
     if previousY is None:
         return
 
@@ -306,7 +329,7 @@ def _fillVerticalGap(graph, previousY, currentY, x, color):
 
     step = 1 if difference > 0 else -1
     for y in range(previousY + step, currentY, step):
-        graph[y][x] = color + "|" + WHITE
+        renderedHisto[y][x] = color + "|" + WHITE
 
 previousAccel = []
 maxGfw = 0
