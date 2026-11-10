@@ -20,7 +20,7 @@ def connectToServer(args):
     #how long to wait until the next packet is handled.
     #if this is smaller than the packet handling time taken, the programm will be behind what is happening in the game.
     #the larger this number, the less responsive the ui will be.
-    packetHandlingDelay = 0.06
+    packetHandlingDelay = 0.02 #originally 0.06 (17 fps),  now 50 fps
     latestPacket = {}
     lastPackageUsedToUpdate = None
 
@@ -42,11 +42,13 @@ def connectToServer(args):
 
                         t2 = time.time()
 
-                        timeToHandlePacket = round(t2 - t1, 2)
+                        timeToHandlePacket = round(t2 - t1, 6)
 
                         if timeToHandlePacket > packetHandlingDelay:
                             print("interpreting packet took too long, cpu not sleeping!")
                         #print("Packet took: " + str(timeToHandlePacket))
+                        #print("Packet rendering at: " +str(round(1/timeToHandlePacket)) + " FPS")
+                        #print("Terminal refreshing at: " +str(round(1/packetHandlingDelay)) + " FPS")
                         interpTime = recvTime
 
                 except socket.error:
