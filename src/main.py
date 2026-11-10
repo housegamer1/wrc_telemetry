@@ -20,7 +20,7 @@ def connectToServer(args):
     #how long to wait until the next packet is handled.
     #if this is smaller than the packet handling time taken, the programm will be behind what is happening in the game.
     #the larger this number, the less responsive the ui will be.
-    packetHandlingDelay = 0.02 #originally 0.06 (17 fps),  now 50 fps
+    packetHandlingDelay = 0.03 #originally 0.06 (17 fps),  now 33 fps
     latestPacket = {}
     lastPackageUsedToUpdate = None
 
