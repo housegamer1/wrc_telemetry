@@ -59,7 +59,8 @@ def showMenu(args, get=False):
     print(menuString, flush=True)
 
 def clearScreen(args):
-    os.system("") #needed to enable ansi codes. also removes flicker for git bash clear
+    #os system no longer needed. it also slows down package handling from ~500 fps to 50 fps
+    #os.system("") #needed to enable ansi codes. also removes flicker for git bash clear
     if args.isgitbash:
         os.system("clear") #less flicker than cls
         print('\033[?25l', end="")  #hide cursor to prevent flashing. idk why this ansi code works but not clear screen...
@@ -236,6 +237,7 @@ def saveLogFile(args):
         file.close()
 
 def updateSuspensionCatalogue(car, surface, minF, maxF, minB, maxB):
+    global suspensionCatalogueCache
     catalogue = "SuspensionCatalogue.json"
 
     if os.path.isfile(catalogue):
@@ -288,18 +290,21 @@ def updateSuspensionCatalogue(car, surface, minF, maxF, minB, maxB):
         file = open(catalogue, "a+", encoding="utf-8")
         file.write(json.dumps(jsondata))
         file.close()
+        suspensionCatalogueCache = [] #empty the cache after writing so we trigger a reload
 
-
+suspensionCatalogueCache = []
 def getSuspensionCatalogue():
-    catalogue = "SuspensionCatalogue.json"
-    content = []
+    global suspensionCatalogueCache
 
-    if os.path.isfile(catalogue):
-        file = open(catalogue, "r", encoding="utf-8")
-        content = json.loads(file.read())
-        file.close()
+    if suspensionCatalogueCache == []:
+        catalogue = "SuspensionCatalogue.json"
 
-    return content
+        if os.path.isfile(catalogue):
+            file = open(catalogue, "r", encoding="utf-8")
+            suspensionCatalogueCache = json.loads(file.read())
+            file.close()
+
+    return suspensionCatalogueCache
 
 def updatePBTable(packet):
     table = "TimesDatabase.csv"
