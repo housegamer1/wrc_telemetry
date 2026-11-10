@@ -201,14 +201,14 @@ def _pickCharToDraw(dp, oldDp):
 
     return chars
 
-renderedHisto = [] #a list of "cells" containing [color modifier + character + color resetter]. 
+renderedHisto = [] #a list of "cells" containing [color modifier + character + color resetter].
 lastDatapointDrawn = {}
 def _visHisto(throttle, brake):
     global renderedHisto
     global lastDatapointDrawn
 
     height = 11 #11 so WOT (10) will not out of bounds
-    width = 30 #equal to age    
+    width = 30 #equal to age
     if inout.toggleAccelerometer == 0:
         width = 90
 
@@ -238,7 +238,6 @@ def _visHisto(throttle, brake):
     # happens before rewrite, so that if current column is determined to be a "|", it will be overwritten
     # with actual input / \ or _.
     # directly modifies the graph
-    
     if lastDatapointDrawn:
         _fillVerticalGap(lastDatapointDrawn["throttle"], dpT, column, GREEN)
         _fillVerticalGap(lastDatapointDrawn["brake"], dpB, column, RED)
@@ -298,7 +297,7 @@ def _correctGraphTransition(graph):
                 row[x] = RED + "_" + WHITE
 
                 if y + 1 < height and x > 0:
-                    if graph[y + 1][x - 1] != RED + "|" + WHITE and graph[y + 1][x - 1] != RED + "|" + WHITE:
+                    if graph[y + 1][x - 1] != RED + "|" + WHITE and graph[y + 1][x] != RED + "|" + WHITE:
                         graph[y + 1][x - 1] = RED + "/" + WHITE
 
 def _fillVerticalGap(previousY, currentY, x, color):
